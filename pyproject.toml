@@ -1,0 +1,22 @@
+[tool.pdm]
+
+[project]
+name = "soluanalysis"
+version = "0.0.1"
+description = "Finds ions in solution, using Python and python bindings"
+authors = [
+    {name = "Amrita Goswami", email = "amrita@hi.is"},
+]
+dependencies = []
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.urls]
+"Source Code" = "https://github.com/TheochemUI/pypotlib"
+"Bug Tracker" = "https://github.com/TheochemUI/pypotlib/issues"
+
+[build-system]
+requires = ["pybind11", "meson-python"]
+build-backend = "mesonpy"
+# Important, tells pip how to install the package

@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+pdm.lock
+
 # C extensions
 *.so
 
