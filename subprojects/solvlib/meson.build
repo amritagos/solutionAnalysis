@@ -12,10 +12,6 @@ _deps += [declare_dependency(link_args: '-lstdc++')]
 fmt_dep = dependency('fmt', required: true)
 _deps += fmt_dep
 
-# eigen3
-eigen_dep = dependency('eigen3', required: true)
-_deps += eigen_dep
-
 inc = include_directories('include')
 solvlib = library('simple',
   'add.cpp',
