@@ -8,10 +8,10 @@
 
 // Basics
 #include "add.hpp"
+#include "system.hpp"
 // Bindings
 #include <pybind11/pybind11.h>
 // Additional
-#include <pybind11/eigen.h>
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
 // Namespaces
@@ -20,7 +20,22 @@ using namespace pybind11::literals;   // For ""_a
 namespace py = pybind11;              // Convention
 
 PYBIND11_MODULE(solvlib, m) {
-    m.doc() = "pybind11 example plugin"; // optional module docstring
+  m.doc() = "Python bindings for solvlib"; // optional module docstring
 
-    m.def("add", &my_add, "A function that adds two numbers");
+  m.def("add", &my_add, "A function that adds two numbers");
+
+  py::class_<SolvLib::Atom>(m, "Atom")
+      .def(py::init<>())
+      .def_readwrite("id", &SolvLib::Atom::id)
+      .def_readwrite("mol_id", &SolvLib::Atom::mol_id)
+      .def_readwrite("type", &SolvLib::Atom::type);
+
+  py::class_<SolvLib::System>(m, "System")
+      .def(py::init<>())
+      .def(py::init<const std::vector<SolvLib::Atom> &,
+                    std::optional<std::vector<double>>>())
+      .def_readwrite("atoms", &SolvLib::System::atoms)
+      .def_readwrite("box", &SolvLib::System::box)
+      .def("n_atoms", &SolvLib::System::n_atoms)
+      .def("push_back", &SolvLib::System::push_back);
 }
