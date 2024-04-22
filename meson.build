@@ -1,4 +1,4 @@
-project('my_project', 'cpp', 
+project('soluanalysis', 'cpp', 
   default_options : ['warning_level=3', 'cpp_std=c++20'])
 
 # Add C++ compiler options
@@ -40,8 +40,3 @@ py.install_sources([
   pure: false, # install next to compiled extension
   subdir: 'soluanalysis'
 )
-
-# executable('my_project',
-#   'my_project.cpp',
-#   dependencies : _deps,
-#   install : true)
