@@ -7,7 +7,7 @@ Some code to find ion pairs in solution. WIP.
 ```bash
 micromamba create -f environment.yml # For the first time only
 micromamba activate soluenv
-pdm install
+pip install -e . --no-build-isolation
 ```
 
 ## Usage
