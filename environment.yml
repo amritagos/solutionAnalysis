@@ -23,6 +23,7 @@ dependencies:
   - pandas 
   - statsmodels
   - ipykernel 
+  - catch2
   # - cmake
     #- gcc
     # - clang

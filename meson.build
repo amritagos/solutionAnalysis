@@ -11,6 +11,9 @@ _deps = [] # Dependencies
 solvlib_dep = dependency('solvlib', fallback : ['solvlib', 'solvlib_dep'])
 _deps += solvlib_dep
 
+graphlib_dep = dependency('graph_lib', fallback : ['graph_lib', 'graphlib_dep'])
+_deps += graphlib_dep
+
 # ---------------------- Bindings
 
 py_mod = import('python')

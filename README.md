@@ -7,6 +7,9 @@ Some code to find ion pairs in solution. WIP.
 ```bash
 micromamba create -f environment.yml # For the first time only
 micromamba activate soluenv
+rm -rf subprojects 
+git restore subprojects
+meson setup build --wipe
 pip install -e . --no-build-isolation
 ```
 
