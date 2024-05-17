@@ -18,7 +18,15 @@ pip install -e . --no-build-isolation
 For now, I've just implemented a simple add function in C++
 `solvlib` is the C++ library.
 
-```python
+```bash
 import soluanalysis as solu
 solu.solvlib.add(1,2)
+```
+
+### Testing
+
+We test with `pytest`. Run it like so (in verbose mode): 
+
+```bash
+pytest -v
 ```
