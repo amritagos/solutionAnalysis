@@ -17,7 +17,6 @@ dependencies:
   - fmt
   - eigen
   - pkg-config
-  - moltemplate
   - matplotlib
   - ipython
   - pandas 
