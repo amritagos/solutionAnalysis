@@ -37,5 +37,12 @@ PYBIND11_MODULE(solvlib, m) {
       .def_readwrite("atoms", &SolvLib::System::atoms)
       .def_readwrite("box", &SolvLib::System::box)
       .def("n_atoms", &SolvLib::System::n_atoms)
+      .def("del",
+           static_cast<void (SolvLib::System::*)(int)>(&SolvLib::System::del),
+           "Delete the (n+1)^th Atom from the System")
+      .def("del",
+           static_cast<void (SolvLib::System::*)(int, int)>(
+               &SolvLib::System::del),
+           "Delete a range of Atom objects, in the range [first, last)")
       .def("push_back", &SolvLib::System::push_back);
 }
