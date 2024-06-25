@@ -44,3 +44,7 @@ def test_system(simple_system):
     # Delete the intermediate H atoms
     simple_system.delete(1, 3)
     assert simple_system.n_atoms() == 3
+
+    # Check that the correct Atom objects have been deleted
+    ids = simple_system.collect_ids()
+    assert ids == [1, 4, 5]

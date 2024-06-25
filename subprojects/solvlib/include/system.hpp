@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <optional>
 #include <system_error>
 #include <vector>
@@ -45,6 +46,16 @@ public:
 
   // Add an atom to the System object
   void push_back(const Atom &atom) { atoms.push_back(atom); }
+
+  // Collect all the IDs in the System object
+  std::vector<int> collect_ids() {
+    auto ids = std::vector<int>{};
+
+    std::transform(atoms.begin(), atoms.end(), std::back_inserter(ids),
+                   [](Atom const &a) -> double { return a.id; });
+
+    return ids;
+  }
 
   // Get the number of atoms
   int n_atoms() { return atoms.size(); }

@@ -42,6 +42,7 @@ PYBIND11_MODULE(solvlib, m) {
       .def_readwrite("box", &SolvLib::System::box)
       .def_readwrite("boxLo", &SolvLib::System::boxLo)
       .def("n_atoms", &SolvLib::System::n_atoms)
+      .def("collect_ids", &SolvLib::System::collect_ids)
       .def("delete",
            static_cast<void (SolvLib::System::*)(int)>(&SolvLib::System::del),
            "Delete the (n+1)^th Atom from the System")
