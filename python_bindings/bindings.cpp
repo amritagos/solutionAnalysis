@@ -9,7 +9,6 @@
 #include <utility>
 
 // Basics
-#include "add.hpp"
 #include "system.hpp"
 // Bindings
 #include <pybind11/pybind11.h>
@@ -24,9 +23,8 @@ namespace py = pybind11;              // Convention
 PYBIND11_MODULE(solvlib, m) {
   m.doc() = "Python bindings for solvlib"; // optional module docstring
 
-  m.def("add", &my_add, "A function that adds two numbers");
-
-  py::class_<SolvLib::Atom>(m, "Atom")
+  py::class_<SolvLib::Atom>(
+      m, "Atom", "A struct for holding the ID, type, molecule ID and position")
       .def(py::init<>())
       .def(py::init<int, int, std::optional<int>, std::vector<double> &>())
       .def_readwrite("id", &SolvLib::Atom::id)
@@ -34,7 +32,8 @@ PYBIND11_MODULE(solvlib, m) {
       .def_readwrite("type", &SolvLib::Atom::type)
       .def_readwrite("position", &SolvLib::Atom::position);
 
-  py::class_<SolvLib::System>(m, "System")
+  py::class_<SolvLib::System>(m, "System",
+                              "A class for a collection of Atom objects")
       .def(py::init<>())
       .def(py::init<const std::vector<SolvLib::Atom> &,
                     std::optional<std::vector<double>> &,

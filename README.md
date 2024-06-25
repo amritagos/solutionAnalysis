@@ -15,12 +15,11 @@ pip install -e . --no-build-isolation
 
 ## Usage
 
-For now, I've just implemented a simple add function in C++
-`solvlib` is the C++ library.
+`solvlib` is the C++ library. The library `graph_lib` contains classes for the Network class.
 
 ```bash
 import soluanalysis as solu
-solu.solvlib.add(1,2)
+system = solu.solvlib.System()
 ```
 
 ### Testing

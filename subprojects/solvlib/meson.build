@@ -13,8 +13,7 @@ fmt_dep = dependency('fmt', required: true)
 _deps += fmt_dep
 
 inc = include_directories('include')
-solvlib = library('simple',
-  'add.cpp',
+solvlib = library('solvlib',
   include_directories : inc,
   dependencies: _deps,
   install : true)
