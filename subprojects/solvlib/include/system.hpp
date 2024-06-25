@@ -6,20 +6,30 @@
 namespace SolvLib {
 
 // Holds information about an individual atom
+// Assuming that the data is 3-D
 struct Atom {
-  int id{};                                 // Identifier number
-  std::optional<int> mol_id = std::nullopt; // Molecule identifier
+  Atom() = default;
+  Atom(int id, int type, std::optional<int> mol_id,
+       std::vector<double> &position)
+      : id(id), type(type), mol_id(mol_id), position(position) {}
+  int id{};   // Identifier number
   int type{}; // Type number of the atom (could be an atomic number, or type
               // number as in LAMMPS)
+  std::optional<int> mol_id = std::nullopt; // Molecule identifier
+  std::vector<double> position{3, 0.0};     // Default initialized to 0.0
 };
 
 class System {
 public:
   std::vector<Atom> atoms{};
   std::optional<std::vector<double>> box = std::nullopt;
+  std::optional<std::vector<double>> boxLo =
+      std::nullopt; // Lower limits of the simulation box
 
-  System(const std::vector<Atom> &atoms, std::optional<std::vector<double>> box)
-      : atoms(atoms), box(box) {}
+  System(const std::vector<Atom> &atoms,
+         std::optional<std::vector<double>> &box,
+         std::optional<std::vector<double>> &boxLo)
+      : atoms(atoms), box(box), boxLo(boxLo) {}
 
   System() = default;
 

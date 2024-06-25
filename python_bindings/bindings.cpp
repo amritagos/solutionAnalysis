@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+#include <vector>
 #define PYBIND11_DETAILED_ERROR_MESSAGES
 // Standard libraries
 #include <fstream>
@@ -26,16 +28,20 @@ PYBIND11_MODULE(solvlib, m) {
 
   py::class_<SolvLib::Atom>(m, "Atom")
       .def(py::init<>())
+      .def(py::init<int, int, std::optional<int>, std::vector<double> &>())
       .def_readwrite("id", &SolvLib::Atom::id)
       .def_readwrite("mol_id", &SolvLib::Atom::mol_id)
-      .def_readwrite("type", &SolvLib::Atom::type);
+      .def_readwrite("type", &SolvLib::Atom::type)
+      .def_readwrite("position", &SolvLib::Atom::position);
 
   py::class_<SolvLib::System>(m, "System")
       .def(py::init<>())
       .def(py::init<const std::vector<SolvLib::Atom> &,
-                    std::optional<std::vector<double>>>())
+                    std::optional<std::vector<double>> &,
+                    std::optional<std::vector<double>> &>())
       .def_readwrite("atoms", &SolvLib::System::atoms)
       .def_readwrite("box", &SolvLib::System::box)
+      .def_readwrite("boxLo", &SolvLib::System::boxLo)
       .def("n_atoms", &SolvLib::System::n_atoms)
       .def("del",
            static_cast<void (SolvLib::System::*)(int)>(&SolvLib::System::del),
