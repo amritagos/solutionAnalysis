@@ -36,6 +36,17 @@ py.extension_module(
   subdir: 'soluanalysis/'
 )
 
+py.extension_module(
+  'graphlib',
+  sources : [
+    'python_bindings/bindings.cpp'
+  ],
+  dependencies: _deps,
+  cpp_args : _args,
+  install: true,
+  subdir: 'soluanalysis/'
+)
+
 # soluanalysis, main package
 py.install_sources([
     'soluanalysis/__init__.py',

@@ -1,4 +1,7 @@
 #pragma once
+#include "network_base.hpp"
+#include "undirected_network.hpp"
+#include <cstddef>
 #include <optional>
 #include <vector>
 #define PYBIND11_DETAILED_ERROR_MESSAGES
@@ -9,7 +12,9 @@
 #include <utility>
 
 // Basics
+#include "network_base.hpp"
 #include "system.hpp"
+#include "undirected_network.hpp"
 // Bindings
 #include <pybind11/pybind11.h>
 // Additional
@@ -51,4 +56,20 @@ PYBIND11_MODULE(solvlib, m) {
                &SolvLib::System::del),
            "Delete a range of Atom objects, in the range [first, last)")
       .def("push_back", &SolvLib::System::push_back);
+}
+
+PYBIND11_MODULE(graphlib, m) {
+  m.doc() = "Python bindings for graph_lib"; // optional module docstring
+
+  py::class_<Graph::NetworkBase<double>> give_me_a_name(
+      m, "NetworkBase",
+      "An abstract base class for undirected and directed networks");
+
+  py::class_<Graph::UndirectedNetwork<double>, Graph::NetworkBase<double>>(
+      m, "UndirectedNetwork",
+      "A class that represents an undirected graph using adjacency lists")
+      .def(py::init<>())
+      .def(py::init<size_t>())
+      .def(py::init<std::vector<std::vector<size_t>> &&,
+                    std::vector<std::vector<double>> &&>());
 }
