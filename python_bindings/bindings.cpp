@@ -78,7 +78,8 @@ PYBIND11_MODULE(graphlib, m) {
            "the network")
       .def("n_edges", &Graph::UndirectedNetwork<double>::n_edges,
            "Gives the number of edges connected to the node. If node is None, "
-           "gives the total number of edges")
+           "gives the total number of edges",
+           py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::UndirectedNetwork<double>::clear,
            "Clears the network")
       .def("get_neighbours", &Graph::UndirectedNetwork<double>::get_neighbours,
@@ -122,7 +123,8 @@ PYBIND11_MODULE(graphlib, m) {
            "the network")
       .def("n_edges", &Graph::DirectedNetwork<double>::n_edges,
            "Gives the number of edges connected to the node. If node is None, "
-           "gives the total number of edges")
+           "gives the total number of edges",
+           py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::DirectedNetwork<double>::clear,
            "Clears the network")
       .def("get_neighbours", &Graph::DirectedNetwork<double>::get_neighbours,
