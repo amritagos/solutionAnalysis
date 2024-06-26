@@ -12,6 +12,7 @@
 #include <utility>
 
 // Basics
+#include "directed_network.hpp"
 #include "network_base.hpp"
 #include "system.hpp"
 #include "undirected_network.hpp"
@@ -71,5 +72,73 @@ PYBIND11_MODULE(graphlib, m) {
       .def(py::init<>())
       .def(py::init<size_t>())
       .def(py::init<std::vector<std::vector<size_t>> &&,
-                    std::vector<std::vector<double>> &&>());
+                    std::vector<std::vector<double>> &&>())
+      .def("n_nodes", &Graph::UndirectedNetwork<double>::n_agents,
+           "A function that gives the number of nodes, or agents or atoms in "
+           "the network")
+      .def("n_edges", &Graph::UndirectedNetwork<double>::n_edges,
+           "Gives the number of edges connected to the node. If node is None, "
+           "gives the total number of edges")
+      .def("clear", &Graph::UndirectedNetwork<double>::clear,
+           "Clears the network")
+      .def("get_neighbours", &Graph::UndirectedNetwork<double>::get_neighbours,
+           "Gives a view into the neighbour indices connected to node index")
+      .def("get_weights", &Graph::UndirectedNetwork<double>::get_weights,
+           "Gives a view into the edge weights connected to node index")
+      .def("set_edge_weight",
+           &Graph::UndirectedNetwork<double>::set_edge_weight,
+           "Sets the weight for a node index, for an existing neighbour index")
+      .def("get_edge_weight",
+           &Graph::UndirectedNetwork<double>::get_edge_weight,
+           "Gets the weight for a node index, for an existing neighbour index")
+      .def("push_back_neighbour_and_weight",
+           &Graph::UndirectedNetwork<double>::push_back_neighbour_and_weight,
+           "Adds an edge between node_i and node_j with weight w. This could "
+           "cause double counting, if not carefully called.")
+      .def("remove_double_counting",
+           &Graph::UndirectedNetwork<double>::remove_double_counting,
+           "Sorts the neighbours by index and removes doubly counted edges by "
+           "summing the weights");
+
+  py::enum_<Graph::DirectedNetwork<double>::EdgeDirection>(
+      m, "EdgeDirection",
+      "Enum class for handling the direction of the edges in the directed "
+      "network")
+      .value("Incoming",
+             Graph::DirectedNetwork<double>::EdgeDirection::Incoming)
+      .value("Outgoing",
+             Graph::DirectedNetwork<double>::EdgeDirection::Outgoing);
+
+  py::class_<Graph::DirectedNetwork<double>, Graph::NetworkBase<double>>(
+      m, "DirectedNetwork",
+      "A class that represents a directed graph using adjacency lists")
+      .def(py::init<>())
+      .def(py::init<size_t>())
+      .def(py::init<std::vector<std::vector<size_t>> &&,
+                    std::vector<std::vector<double>> &&,
+                    Graph::DirectedNetwork<double>::EdgeDirection>())
+      .def("n_nodes", &Graph::DirectedNetwork<double>::n_agents,
+           "A function that gives the number of nodes, or agents or atoms in "
+           "the network")
+      .def("n_edges", &Graph::DirectedNetwork<double>::n_edges,
+           "Gives the number of edges connected to the node. If node is None, "
+           "gives the total number of edges")
+      .def("clear", &Graph::DirectedNetwork<double>::clear,
+           "Clears the network")
+      .def("get_neighbours", &Graph::DirectedNetwork<double>::get_neighbours,
+           "Gives a view into the neighbour indices connected to node index")
+      .def("get_weights", &Graph::DirectedNetwork<double>::get_weights,
+           "Gives a view into the edge weights connected to node index")
+      .def("set_edge_weight", &Graph::DirectedNetwork<double>::set_edge_weight,
+           "Sets the weight for a node index, for an existing neighbour index")
+      .def("get_edge_weight", &Graph::DirectedNetwork<double>::get_edge_weight,
+           "Gets the weight for a node index, for an existing neighbour index")
+      .def("push_back_neighbour_and_weight",
+           &Graph::DirectedNetwork<double>::push_back_neighbour_and_weight,
+           "Adds an edge between node_i and node_j with weight w. This could "
+           "cause double counting, if not carefully called.")
+      .def("remove_double_counting",
+           &Graph::DirectedNetwork<double>::remove_double_counting,
+           "Sorts the neighbours by index and removes doubly counted edges by "
+           "summing the weights");
 }
