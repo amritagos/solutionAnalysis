@@ -29,7 +29,7 @@ def simple_system():
     return system
 
 
-def test_system(simple_system):
+def test_system_object(simple_system):
     """
     Test that you can get the number of atoms and modify the System object etc.
     """
