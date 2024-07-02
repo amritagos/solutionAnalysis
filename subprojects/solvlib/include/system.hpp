@@ -32,6 +32,32 @@ public:
          std::optional<std::vector<double>> &boxLo)
       : atoms(atoms), box(box), boxLo(boxLo) {}
 
+  System(const std::vector<int> &ids, const std::vector<int> &types,
+         const std::vector<std::vector<double>> &positions,
+         std::optional<std::vector<int>> mol_ids = std::nullopt,
+         std::optional<std::vector<double>> box = std::nullopt,
+         std::optional<std::vector<double>> boxLo = std::nullopt)
+      : box(box), boxLo(boxLo) {
+    if (mol_ids.has_value()) {
+      if (ids.size() != types.size() || ids.size() != mol_ids.value().size() ||
+          ids.size() != positions.size()) {
+        throw std::invalid_argument("Input vectors must have the same size");
+      }
+      for (size_t i = 0; i < ids.size(); ++i) {
+        atoms.emplace_back(ids[i], types[i], mol_ids.value()[i],
+                           const_cast<std::vector<double> &>(positions[i]));
+      }
+    } else {
+      if (ids.size() != types.size() || ids.size() != positions.size()) {
+        throw std::invalid_argument("Input vectors must have the same size");
+      }
+      for (size_t i = 0; i < ids.size(); ++i) {
+        atoms.emplace_back(ids[i], types[i], std::nullopt,
+                           const_cast<std::vector<double> &>(positions[i]));
+      }
+    }
+  }
+
   System() = default;
 
   // Delete the (n+1)^th Atom in the System object

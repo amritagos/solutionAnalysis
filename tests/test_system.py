@@ -29,6 +29,26 @@ def simple_system():
     return system
 
 
+def test_system_creation():
+    """
+    Test that you can create a System object from vectors of Atom member parameters (such as positions).
+    """
+    ids = [1, 2, 3]
+    types = [1, 2, 2]
+    pos = [
+        [33.701145, 31.147538, 48.163726],
+        [33.608039, 32.001989, 48.014306],
+        [32.880148, 30.854267, 48.195911],
+    ]
+    mol_ids = [1, 1, 1]
+    box = [49.35, 49.35, 49.35]
+    boxLo = [0, 0, 0]
+    system = solu.solvlib.System(ids, types, pos, mol_ids, box, boxLo)
+
+    # Test that the IDs are correct
+    assert system.collect_ids() == ids
+
+
 def test_system_object(simple_system):
     """
     Test that you can get the number of atoms and modify the System object etc.

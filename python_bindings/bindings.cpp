@@ -44,6 +44,13 @@ PYBIND11_MODULE(solvlib, m) {
       .def(py::init<const std::vector<SolvLib::Atom> &,
                     std::optional<std::vector<double>> &,
                     std::optional<std::vector<double>> &>())
+      .def(py::init<const std::vector<int> &, const std::vector<int> &,
+                    const std::vector<std::vector<double>> &,
+                    std::optional<std::vector<int>>,
+                    std::optional<std::vector<double>>,
+                    std::optional<std::vector<double>>>(),
+           "Constructor for System that takes in the ids, types, positions, "
+           "optionally the molecule IDs, box size and lower box limits")
       .def_readwrite("atoms", &SolvLib::System::atoms)
       .def_readwrite("box", &SolvLib::System::box)
       .def_readwrite("boxLo", &SolvLib::System::boxLo)
