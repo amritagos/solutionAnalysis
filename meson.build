@@ -54,3 +54,11 @@ py.install_sources([
   pure: false, # install next to compiled extension
   subdir: 'soluanalysis'
 )
+
+# IO
+py.install_sources([
+    'soluanalysis/io.py',
+  ],
+  pure: false,
+  subdir: 'soluanalysis'
+)
