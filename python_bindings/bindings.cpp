@@ -67,7 +67,10 @@ PYBIND11_MODULE(james, m) {
       .def("push_back", &James::Atoms::System::push_back)
       .def("distance", &James::Atoms::System::distance,
            "Gets the distance between two Atom objects in the System, using "
-           "the minimum image convention if the box has been defined.");
+           "the minimum image convention if the box has been defined.")
+      .def("find_atoms_in_molecule",
+           &James::Atoms::System::find_atoms_in_molecule,
+           "Finds all indices in atoms such that the molecule ID is the same");
 }
 
 PYBIND11_MODULE(graphlib, m) {
