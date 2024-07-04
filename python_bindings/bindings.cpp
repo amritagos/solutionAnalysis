@@ -64,7 +64,10 @@ PYBIND11_MODULE(james, m) {
            static_cast<void (James::Atoms::System::*)(int, int)>(
                &James::Atoms::System::del),
            "Delete a range of Atom objects, in the range [first, last)")
-      .def("push_back", &James::Atoms::System::push_back);
+      .def("push_back", &James::Atoms::System::push_back)
+      .def("distance", &James::Atoms::System::distance,
+           "Gets the distance between two Atom objects in the System, using "
+           "the minimum image convention if the box has been defined.");
 }
 
 PYBIND11_MODULE(graphlib, m) {
