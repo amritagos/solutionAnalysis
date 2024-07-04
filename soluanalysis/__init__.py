@@ -1,2 +1,2 @@
-from soluanalysis import solvlib
+from soluanalysis import james
 from soluanalysis import graphlib

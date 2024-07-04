@@ -5,7 +5,7 @@ from typing import List, Optional
 from pathlib import Path
 from collections import deque
 from os.path import splitext
-from soluanalysis.solvlib import Atom, System
+from soluanalysis.james import Atom, System
 
 
 def lammps_data_to_system(

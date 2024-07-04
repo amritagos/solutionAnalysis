@@ -26,22 +26,22 @@ using namespace std::string_literals; // For ""s
 using namespace pybind11::literals;   // For ""_a
 namespace py = pybind11;              // Convention
 
-PYBIND11_MODULE(solvlib, m) {
-  m.doc() = "Python bindings for solvlib"; // optional module docstring
+PYBIND11_MODULE(james, m) {
+  m.doc() = "Python bindings for james"; // optional module docstring
 
-  py::class_<SolvLib::Atom>(
+  py::class_<James::Atoms::Atom>(
       m, "Atom", "A struct for holding the ID, type, molecule ID and position")
       .def(py::init<>())
       .def(py::init<int, int, std::optional<int>, std::vector<double> &>())
-      .def_readwrite("id", &SolvLib::Atom::id)
-      .def_readwrite("mol_id", &SolvLib::Atom::mol_id)
-      .def_readwrite("type", &SolvLib::Atom::type)
-      .def_readwrite("position", &SolvLib::Atom::position);
+      .def_readwrite("id", &James::Atoms::Atom::id)
+      .def_readwrite("mol_id", &James::Atoms::Atom::mol_id)
+      .def_readwrite("type", &James::Atoms::Atom::type)
+      .def_readwrite("position", &James::Atoms::Atom::position);
 
-  py::class_<SolvLib::System>(m, "System",
-                              "A class for a collection of Atom objects")
+  py::class_<James::Atoms::System>(m, "System",
+                                   "A class for a collection of Atom objects")
       .def(py::init<>())
-      .def(py::init<const std::vector<SolvLib::Atom> &,
+      .def(py::init<const std::vector<James::Atoms::Atom> &,
                     std::optional<std::vector<double>> &,
                     std::optional<std::vector<double>> &>())
       .def(py::init<const std::vector<int> &, const std::vector<int> &,
@@ -51,19 +51,20 @@ PYBIND11_MODULE(solvlib, m) {
                     std::optional<std::vector<double>>>(),
            "Constructor for System that takes in the ids, types, positions, "
            "optionally the molecule IDs, box size and lower box limits")
-      .def_readwrite("atoms", &SolvLib::System::atoms)
-      .def_readwrite("box", &SolvLib::System::box)
-      .def_readwrite("boxLo", &SolvLib::System::boxLo)
-      .def("n_atoms", &SolvLib::System::n_atoms)
-      .def("collect_ids", &SolvLib::System::collect_ids)
+      .def_readwrite("atoms", &James::Atoms::System::atoms)
+      .def_readwrite("box", &James::Atoms::System::box)
+      .def_readwrite("boxLo", &James::Atoms::System::boxLo)
+      .def("n_atoms", &James::Atoms::System::n_atoms)
+      .def("collect_ids", &James::Atoms::System::collect_ids)
       .def("delete",
-           static_cast<void (SolvLib::System::*)(int)>(&SolvLib::System::del),
+           static_cast<void (James::Atoms::System::*)(int)>(
+               &James::Atoms::System::del),
            "Delete the (n+1)^th Atom from the System")
       .def("delete",
-           static_cast<void (SolvLib::System::*)(int, int)>(
-               &SolvLib::System::del),
+           static_cast<void (James::Atoms::System::*)(int, int)>(
+               &James::Atoms::System::del),
            "Delete a range of Atom objects, in the range [first, last)")
-      .def("push_back", &SolvLib::System::push_back);
+      .def("push_back", &James::Atoms::System::push_back);
 }
 
 PYBIND11_MODULE(graphlib, m) {

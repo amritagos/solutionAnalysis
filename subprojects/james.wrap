@@ -1,0 +1,5 @@
+[wrap-git]
+directory=james
+url=https://github.com/amritagos/james.git
+revision = head
+depth = 1

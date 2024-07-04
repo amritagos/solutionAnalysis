@@ -8,11 +8,9 @@ _deps = [] # Dependencies
 
 # ---------------------- Library Dependencies
 
-solvlib_dep = dependency('solvlib', fallback : ['solvlib', 'solvlib_dep'])
-_deps += solvlib_dep
-
-graphlib_dep = dependency('graph_lib', fallback : ['graph_lib', 'graphlib_dep'])
-_deps += graphlib_dep
+# james has graph_lib as a dependency already
+james_dep = dependency('james', fallback : ['james', 'james_dep'])
+_deps += james_dep
 
 # ---------------------- Bindings
 
@@ -26,7 +24,7 @@ _deps += [pyb11_dep]
 
 # for the bindings
 py.extension_module(
-  'solvlib',
+  'james',
   sources : [
     'python_bindings/bindings.cpp'
   ],
