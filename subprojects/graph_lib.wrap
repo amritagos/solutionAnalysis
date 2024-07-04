@@ -1,5 +1,0 @@
-[wrap-git]
-directory=graph_lib
-url=https://github.com/seldon-code/graph_lib.git
-revision = head
-depth = 1
