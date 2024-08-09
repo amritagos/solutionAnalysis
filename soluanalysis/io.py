@@ -1,7 +1,7 @@
 __all__ = ["read_lammps_dump"]
 
 import numpy as np
-from typing import List, Optional
+from typing import List, Optional, TextIO, Union
 from pathlib import Path
 from collections import deque
 from os.path import splitext
@@ -103,7 +103,102 @@ def get_max_index(index):
         return index.stop if (index.stop is not None) else float("inf")
 
 
-def read_lammps_dump(file_path: Path, index=-1) -> List[System]:
+def write_single_frame(fd: TextIO, system: System, timestep: int) -> None:
+    """Writes out a single frame to a file handle. Inspired by ASE `write_lammps_data` function.
+
+    Args:
+        fd (TextIO): File being written to
+        system (System): The System object whose data is being written out
+        timestep (int): Current timestep corresponding to the System object
+    """
+    # The output format is:
+    # ITEM: TIMESTEP
+    # 0
+    # ITEM: NUMBER OF ATOMS
+    # 22
+    # ITEM: BOX BOUNDS pp pp pp
+    # -12.457628299 37.0176282278
+    # -12.457628299 37.0176282278
+    # -12.457628299 37.0176282278
+    # ITEM: ATOMS id type mol x y z
+    n_atoms = system.n_atoms()
+
+    # Write out the single frame
+    fd.write("ITEM: TIMESTEP\n")
+    fd.write(f"{timestep}\n")
+    fd.write("ITEM: NUMBER OF ATOMS\n")
+    fd.write(f"{n_atoms}\n")
+    fd.write("ITEM: BOX BOUNDS pp pp pp\n")
+    for i_boxLow, i_boxsize in zip(system.boxLo, system.box):
+        box_hi = i_boxLow + i_boxsize
+        fd.write(f"{i_boxLow:23.17g} {box_hi:23.17g}\n")
+    fd.write("ITEM: ATOMS id type mol x y z\n")
+    # Loop through all the atoms
+    for atom in system.atoms:
+        if atom.mol_id == None:
+            mol_id = atom.id
+        else:
+            mol_id = atom.mol_id
+        line = f"{atom.id:>6} {atom.type:>3} {atom.mol_id:>6}"
+        # Add the positions
+        for pos in atom.position:
+            line += f" {pos:23.17g}"
+        fd.write(line)  # actually write the line
+
+
+def write_lammps_dump(
+    file_path: Path,
+    systems: Union[List[System], System],
+    timesteps: Union[List[int], int],
+) -> None:
+    """Writes out a LAMMPS trajectory file using a list of System objects (or a single System object). No support for triclinic boxes
+
+    Args:
+        file_path (Path): File path
+        systems (Union[List[System], System]): System object(s) whose information will be written out
+        timesteps (Union[List[int], int]) : Timesteps corresponding to each system
+    """
+
+    # The output format is:
+    # ITEM: TIMESTEP
+    # 0
+    # ITEM: NUMBER OF ATOMS
+    # 22
+    # ITEM: BOX BOUNDS pp pp pp
+    # -12.457628299 37.0176282278
+    # -12.457628299 37.0176282278
+    # -12.457628299 37.0176282278
+    # ITEM: ATOMS id type mol x y z
+
+    if isinstance(systems, list):
+        # There are multiple steps to be written out
+        # Raise exception if the systems and timesteps are not of the same length
+        try:
+            if len(systems) != len(timesteps):
+                raise ValueError("Systems and timesteps do not have the same size.")
+        except ValueError as err:
+            print(err)
+            if len(systems) > len(timesteps):
+                systems = systems[: len(timesteps)]
+            else:
+                timesteps = timesteps[: len(systems)]
+        with open(file_path, "w") as writer:
+            # Write out the multiple steps
+            for i, (timestep, system) in enumerate(zip(timesteps, systems)):
+                write_single_frame(writer, system, timestep)
+    else:  # for a single frame
+        # if timesteps is a list somehow, then take the first value only
+        if isinstance(timesteps, list):
+            timestep = timesteps[0]
+        else:
+            timestep = timesteps
+        with open(file_path, "w") as writer:
+            write_single_frame(writer, systems, timestep)
+
+
+def read_lammps_dump(
+    file_path: Path, index=-1
+) -> tuple[Union[List[System], System], List[int]]:
     """
     Reads a LAMMPS trajectory file and returns a list of System objects for the specified range of timesteps.
     Similar to the ASE read function. Does not have support for triclinic boxes.
