@@ -139,7 +139,7 @@ def write_single_frame(fd: TextIO, system: System, timestep: int) -> None:
             mol_id = atom.id
         else:
             mol_id = atom.mol_id
-        line = f"{atom.id:>6} {atom.type:>3} {atom.mol_id:>6}"
+        line = f"{atom.id:>6} {atom.type:>3} {mol_id:>6}"
         # Add the positions
         for pos in atom.position:
             line += f" {pos:23.17g}"
