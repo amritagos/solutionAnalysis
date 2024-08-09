@@ -48,6 +48,14 @@ def test_atom():
     assert atom.mol_id == mol_id
     assert atom.position == [33.701145, 31.147538, 48.163726]
 
+    # test what happens when you set mol_id to None
+    atom1 = solu.james.Atom(id, type, None, [33.701145, 31.147538, 48.163726])
+
+    assert atom1.id == atom.id
+    assert atom1.type == atom.type
+    assert atom1.mol_id == None
+    assert atom1.position == atom.position
+
 
 def test_system_creation():
     """
