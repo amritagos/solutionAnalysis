@@ -143,6 +143,7 @@ def write_single_frame(fd: TextIO, system: System, timestep: int) -> None:
         # Add the positions
         for pos in atom.position:
             line += f" {pos:23.17g}"
+        line += "\n"
         fd.write(line)  # actually write the line
 
 
