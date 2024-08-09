@@ -21,6 +21,21 @@ def simple_system():
     return system
 
 
+def test_atom():
+    """
+    Test that you can create an Atom object
+    """
+    id = 1
+    type = 8
+    mol_id = 31
+    atom = solu.james.Atom(id, type, mol_id, [33.701145, 31.147538, 48.163726])
+
+    assert atom.id == id
+    assert atom.type == type
+    assert atom.mol_id == mol_id
+    assert atom.position == [33.701145, 31.147538, 48.163726]
+
+
 def test_system_creation():
     """
     Test that you can create a System object from vectors of Atom member parameters (such as positions).
