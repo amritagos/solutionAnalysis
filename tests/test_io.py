@@ -27,3 +27,31 @@ def test_read_lammps_dump():
 
     # Check that the positions were properly added
     assert atoms.atoms[-1].position == [25.1689, 20.8364, 22.0004]
+
+    # Check that the molecule IDs are correct
+    mol_ids_desired = [
+        333,
+        333,
+        333,
+        521,
+        687,
+        687,
+        687,
+        1627,
+        1683,
+        1683,
+        1683,
+        1924,
+        1924,
+        1924,
+        2319,
+        2319,
+        2319,
+        3273,
+        3273,
+        3273,
+        3968,
+        4099,
+    ]
+    for atom, mol_id_expected in zip(atoms.atoms, mol_ids_desired):
+        assert atom.mol_id == mol_id_expected
