@@ -62,7 +62,7 @@ def test_read_lammps_dump():
     test_dir = Path(__file__).resolve().parent
     infilename = test_dir / "../resources/oct.lammpstrj"
     # Read in the trajectory
-    # Since this is a single frame, there is just one System object
+    # Since this is a single frame, there is just one System object in the list
     atoms, timesteps = read_lammps_dump(infilename)
 
     # There is only one timestep
