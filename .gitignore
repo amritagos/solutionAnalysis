@@ -1,3 +1,9 @@
+# Test outputs that don't need to be committed
+tests/test_single_frame.lammpstrj
+
+# Subproject dependency wrap file for graph_lib not needed 
+subprojects/graph_lib.wrap
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
