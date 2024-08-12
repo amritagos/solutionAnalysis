@@ -197,9 +197,7 @@ def write_lammps_dump(
             write_single_frame(writer, systems, timestep)
 
 
-def read_lammps_dump(
-    file_path: Path, index=-1
-) -> tuple[Union[List[System], System], List[int]]:
+def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]]:
     """
     Reads a LAMMPS trajectory file and returns a list of System objects for the specified range of timesteps.
     Similar to the ASE read function. Does not have support for triclinic boxes.
@@ -268,4 +266,7 @@ def read_lammps_dump(
         if len(images) > index_end >= 0:
             break
 
-    return images[index], timesteps[index]
+    if isinstance(images[index], list):
+        return images[index], timesteps[index]
+    else:
+        return [images[index]], [timesteps[index]]

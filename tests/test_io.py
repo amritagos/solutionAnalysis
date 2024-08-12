@@ -47,10 +47,11 @@ def test_write_read_single_dump(small_system):
     write_lammps_dump(file_path, small_system, timestep)
 
     # Read the file in to a new Systems object
-    system, timestep_read = read_lammps_dump(file_path)
+    systems, timesteps = read_lammps_dump(file_path)
 
-    assert system.atoms[0].mol_id == 31
-    assert system.n_atoms() == small_system.n_atoms()
+    assert systems[0].atoms[0].mol_id == 31
+    assert systems[0].n_atoms() == small_system.n_atoms()
+    assert timesteps[0] == timestep
 
 
 def test_read_lammps_dump():
@@ -65,17 +66,17 @@ def test_read_lammps_dump():
     atoms, timesteps = read_lammps_dump(infilename)
 
     # There is only one timestep
-    assert timesteps == 0
+    assert timesteps[0] == 0
 
     # The number of atoms should be correct
-    assert atoms.n_atoms() == 22
+    assert atoms[0].n_atoms() == 22
 
     # Check the box size and lower box limits
-    assert atoms.box == [49.4752565268, 49.4752565268, 49.4752565268]
-    assert atoms.boxLo == [-12.457628299, -12.457628299, -12.457628299]
+    assert atoms[0].box == [49.4752565268, 49.4752565268, 49.4752565268]
+    assert atoms[0].boxLo == [-12.457628299, -12.457628299, -12.457628299]
 
     # Check that the positions were properly added
-    assert atoms.atoms[-1].position == [25.1689, 20.8364, 22.0004]
+    assert atoms[0].atoms[-1].position == [25.1689, 20.8364, 22.0004]
 
     # Check that the molecule IDs are correct
     mol_ids_desired = [
@@ -102,5 +103,5 @@ def test_read_lammps_dump():
         3968,
         4099,
     ]
-    for atom, mol_id_expected in zip(atoms.atoms, mol_ids_desired):
+    for atom, mol_id_expected in zip(atoms[0].atoms, mol_ids_desired):
         assert atom.mol_id == mol_id_expected
