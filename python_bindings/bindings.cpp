@@ -12,6 +12,7 @@
 #include <utility>
 
 // Basics
+#include "bondfinder.hpp"
 #include "directed_network.hpp"
 #include "network_base.hpp"
 #include "pairtypes.hpp"
@@ -80,6 +81,14 @@ PYBIND11_MODULE(james, m) {
       .def_readwrite("typeA", &James::Bond::Pair::typeA)
       .def_readwrite("typeB", &James::Bond::Pair::typeB)
       .def(py::self == py::self);
+
+  m.def("add_distance_based_bonds", [](Graph::NetworkBase<double> &network,
+                                       const James::Atoms::System &system,
+                                       std::vector<James::Bond::Pair> &pairs,
+                                       std::vector<double> &cutoffs) {
+    return James::Bond::add_distance_based_bonds<double>(network, system, pairs,
+                                                         cutoffs);
+  });
 }
 
 PYBIND11_MODULE(graphlib, m) {
