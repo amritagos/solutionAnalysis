@@ -14,6 +14,7 @@
 // Basics
 #include "directed_network.hpp"
 #include "network_base.hpp"
+#include "pairtypes.hpp"
 #include "system.hpp"
 #include "undirected_network.hpp"
 // Bindings
@@ -71,6 +72,14 @@ PYBIND11_MODULE(james, m) {
       .def("find_atoms_in_molecule",
            &James::Atoms::System::find_atoms_in_molecule,
            "Finds all indices in atoms such that the molecule ID is the same");
+
+  // Bindings to commutative pair types and function for getting distance based
+  // bonds
+  py::class_<James::Bond::Pair>(m, "Pair", "Commutative pair class")
+      .def(py::init<int, int>(), py::arg("typeA"), py::arg("typeB"))
+      .def_readwrite("typeA", &James::Bond::Pair::typeA)
+      .def_readwrite("typeB", &James::Bond::Pair::typeB)
+      .def(py::self == py::self);
 }
 
 PYBIND11_MODULE(graphlib, m) {
