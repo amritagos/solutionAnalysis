@@ -54,16 +54,15 @@ def test_write_read_single_dump(small_system):
     assert timesteps[0] == timestep
 
 
-def test_read_lammps_dump():
+def test_read_lammps_dump(octahedral_system):
     """
     Tests whether you can read in a trajectory into a list of System objects
-    """
 
-    test_dir = Path(__file__).resolve().parent
-    infilename = test_dir / "../resources/oct.lammpstrj"
+    octahedral_system (tuple[List[System], List[int]]): a list of System objects and a list of timesteps, corresponding to the octahedral system
+    """
     # Read in the trajectory
     # Since this is a single frame, there is just one System object in the list
-    atoms, timesteps = read_lammps_dump(infilename)
+    atoms, timesteps = octahedral_system
 
     # There is only one timestep
     assert timesteps[0] == 0
