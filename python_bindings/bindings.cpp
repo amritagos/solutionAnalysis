@@ -16,6 +16,7 @@
 #include "directed_network.hpp"
 #include "network_base.hpp"
 #include "pairtypes.hpp"
+#include "pathfinder.hpp"
 #include "system.hpp"
 #include "undirected_network.hpp"
 // Bindings
@@ -102,6 +103,23 @@ PYBIND11_MODULE(james, m) {
               network, system, donor_atom_types, acceptor_atom_types,
               h_atom_types, cutoff_distance, max_angle_deg, ignore_hydrogens);
         });
+  // Binding for the templated function find_ion_pairs. Templated on the
+  // WeightType of the network
+  m.def("find_ion_pairs", [](size_t source, Graph::NetworkBase<double> &network,
+                             const James::Atoms::System &system,
+                             const std::vector<int> &destination_atom_types,
+                             const std::vector<int> &intermediate_atom_types,
+                             std::optional<int> max_depth,
+                             James::Path::WriteIdentifier identifier =
+                                 James::Path::WriteIdentifier::AtomID) {
+    return James::Path::find_ion_pairs<double>(
+        source, network, system, destination_atom_types,
+        intermediate_atom_types, max_depth, identifier);
+  });
+  // Binding for enum class WriteIdentifier
+  py::enum_<James::Path::WriteIdentifier>(m, "WriteIdentifier")
+      .value("AtomID", James::Path::WriteIdentifier::AtomID)
+      .value("Index", James::Path::WriteIdentifier::Index);
 }
 
 PYBIND11_MODULE(graphlib, m) {
