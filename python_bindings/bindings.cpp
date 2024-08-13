@@ -74,8 +74,8 @@ PYBIND11_MODULE(james, m) {
            &James::Atoms::System::find_atoms_in_molecule,
            "Finds all indices in atoms such that the molecule ID is the same");
 
-  // Bindings to commutative pair types and function for getting distance based
-  // bonds
+  // Bindings to commutative pair types and lambda binding to the function for
+  // getting distance based bonds
   py::class_<James::Bond::Pair>(m, "Pair", "Commutative pair class")
       .def(py::init<int, int>(), py::arg("typeA"), py::arg("typeB"))
       .def_readwrite("typeA", &James::Bond::Pair::typeA)
@@ -89,6 +89,19 @@ PYBIND11_MODULE(james, m) {
     return James::Bond::add_distance_based_bonds<double>(network, system, pairs,
                                                          cutoffs);
   });
+  // Binding for the templated function add_hbonds. This is templated on the
+  // WeightType of the network
+  m.def("add_hbonds",
+        [](Graph::NetworkBase<double> &network,
+           const James::Atoms::System &system,
+           const std::vector<int> &donor_atom_types,
+           const std::vector<int> &acceptor_atom_types,
+           const std::vector<int> &h_atom_types, double cutoff_distance = 3.2,
+           double max_angle_deg = 30, bool ignore_hydrogens = true) {
+          return James::Bond::add_hbonds<double>(
+              network, system, donor_atom_types, acceptor_atom_types,
+              h_atom_types, cutoff_distance, max_angle_deg, ignore_hydrogens);
+        });
 }
 
 PYBIND11_MODULE(graphlib, m) {
