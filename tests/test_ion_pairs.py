@@ -72,5 +72,8 @@ def test_ion_pairs(octahedral_system):
                 identifier,
             )
             ion_pair_list += ion_pairs
-        output_dict[timestep] = ion_pair_list
-    assert output_dict == {timesteps[0]: [[2, 11, 1], [3, 5, 1], [4, 14, 1]]}
+        groups = {}
+        for ion_pair in ion_pair_list:
+            groups.setdefault(len(ion_pair), []).append(ion_pair)
+        output_dict[timestep] = groups
+    assert output_dict == {timesteps[0]: {3: [[2, 11, 1], [3, 5, 1], [4, 14, 1]]}}
