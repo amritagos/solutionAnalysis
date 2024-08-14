@@ -7,8 +7,12 @@ description = "Finds ions in solution, using Python and python bindings"
 authors = [
     {name = "Amrita Goswami", email = "amrita@hi.is"},
 ]
-dependencies = []
-requires-python = ">=3.9"
+dependencies = [
+    "ase >= 3.22.1",
+    "numpy",
+    "h5py"
+    ]
+requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 

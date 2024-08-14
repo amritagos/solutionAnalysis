@@ -41,6 +41,7 @@ dependencies:
   - meson
   - pybind11
   - meson-python
+  - h5py
   - pip:
     # works for regular pip packages
     - lammps-logfile
