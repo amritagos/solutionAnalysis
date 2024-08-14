@@ -1,5 +1,6 @@
 # Test outputs that don't need to be committed
 tests/test_single_frame.lammpstrj
+tests/output_ion_pairs.h5
 
 # Subproject dependency wrap file for graph_lib not needed 
 subprojects/graph_lib.wrap
