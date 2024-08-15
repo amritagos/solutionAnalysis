@@ -277,6 +277,7 @@ def save_ion_pairs_to_hdf5(
     time_series_dict: Dict[int, Dict[int, List[List[int]]]],
     max_depth: int,
     write_identifier: solu.james.WriteIdentifier,
+    n_atoms: int,
     **compression_kwargs: Union[str, int],
 ) -> None:
     """Save the ion pairs per time step, sorted according to length into an HDF5 file.
@@ -295,6 +296,9 @@ def save_ion_pairs_to_hdf5(
         # Save metadata
         file.attrs["max_depth"] = max_depth
         file.attrs["writeIdentifier"] = str(write_identifier)  # convert enum to string
+        file.attrs["n_atoms"] = (
+            n_atoms  # Number of atoms in the system (assuming this does not change, or should be the maximum)
+        )
 
         # Save the timesteps as a separate dataset
         file.create_dataset(
@@ -324,7 +328,11 @@ def save_ion_pairs_to_hdf5(
 def read_ion_paird_from_hdf5(
     file_path: Path,
 ) -> Tuple[
-    Dict[int, Dict[int, List[List[int]]]], List[int], int, solu.james.WriteIdentifier
+    Dict[int, Dict[int, List[List[int]]]],
+    List[int],
+    int,
+    solu.james.WriteIdentifier,
+    int,
 ]:
     """Reads the HDF5 file and reconstructs a dictionary with the time series information about the ion pairs
 
@@ -337,6 +345,7 @@ def read_ion_paird_from_hdf5(
         2) timesteps,
         3) max_depth,
         4) writeIdentifier
+        5) n_atoms
     """
     time_series_dict = {}
 
@@ -349,6 +358,7 @@ def read_ion_paird_from_hdf5(
         # Read the metadata
         max_depth = file.attrs["max_depth"]
         identifier_str = file.attrs["writeIdentifier"]
+        n_atoms = file.attrs["n_atoms"]
 
         # Read the timesteps
         timesteps = file["timesteps"][:].tolist()
@@ -370,5 +380,11 @@ def read_ion_paird_from_hdf5(
 
             time_series_dict[int(timestep)] = groups
 
-        # Return the time series, timesteps, max_depth and the enum
-        return time_series_dict, timesteps, max_depth, enum_mapping.get(identifier_str)
+        # Return the time series, timesteps, max_depth, the enum, and the number of atoms
+        return (
+            time_series_dict,
+            timesteps,
+            max_depth,
+            enum_mapping.get(identifier_str),
+            n_atoms,
+        )

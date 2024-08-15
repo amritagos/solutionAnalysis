@@ -119,12 +119,13 @@ def test_hdf5_files():
     file_path = test_dir / "output_ion_pairs.h5"
     max_depth = 3
     write_identifier = solu.james.WriteIdentifier.AtomID
+    n_atoms = 22
 
     solu.io.save_ion_pairs_to_hdf5(
-        file_path, time_series_data, max_depth, write_identifier
+        file_path, time_series_data, max_depth, write_identifier, n_atoms
     )
 
-    time_series_read, timesteps_read, max_depth_read, identifier_read = (
+    time_series_read, timesteps_read, max_depth_read, identifier_read, n_atoms_read = (
         solu.io.read_ion_paird_from_hdf5(file_path)
     )
 
@@ -132,3 +133,4 @@ def test_hdf5_files():
     assert timesteps_read == timesteps
     assert max_depth_read == max_depth
     assert identifier_read == write_identifier
+    assert n_atoms_read == n_atoms
