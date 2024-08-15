@@ -1,6 +1,7 @@
 import pytest
 import soluanalysis as solu
 from pathlib import Path
+from soluanalysis.ion_pairs import get_ion_pairs_time_series
 
 
 def test_ion_pairs(octahedral_system):
@@ -77,3 +78,23 @@ def test_ion_pairs(octahedral_system):
             groups.setdefault(len(ion_pair), []).append(ion_pair)
         output_dict[timestep] = groups
     assert output_dict == {timesteps[0]: {3: [[2, 11, 1], [3, 5, 1], [4, 14, 1]]}}
+
+    # Also test the convenience function get_ion_pairs_time_series that does the same thing
+    source_atom_types = [fe_type]
+    out_dict_fn = get_ion_pairs_time_series(
+        systems,
+        timesteps,
+        donor_atom_types,
+        acceptor_atom_types,
+        h_atom_types,
+        source_atom_types,
+        destination_atom_types,
+        intermediate_atom_types,
+        max_depth,
+        identifier,
+        donor_acceptor_cutoff,
+        max_angle_deg,
+        pairs,
+        cutoffs,
+    )
+    assert out_dict_fn == output_dict
