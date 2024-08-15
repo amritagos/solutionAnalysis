@@ -81,7 +81,7 @@ def test_ion_pairs(octahedral_system):
 
     # Also test the convenience function get_ion_pairs_time_series that does the same thing
     source_atom_types = [fe_type]
-    out_dict_fn = get_ion_pairs_time_series(
+    out_dict_fn, n_atoms_fn = get_ion_pairs_time_series(
         systems,
         timesteps,
         donor_atom_types,
@@ -98,3 +98,4 @@ def test_ion_pairs(octahedral_system):
         cutoffs,
     )
     assert out_dict_fn == output_dict
+    assert n_atoms_fn == 22

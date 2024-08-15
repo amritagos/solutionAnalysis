@@ -1,5 +1,6 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import soluanalysis as solu
+import numpy as np
 
 
 def get_ion_pairs_time_series(
@@ -17,7 +18,7 @@ def get_ion_pairs_time_series(
     max_angle_deg: float = 30,
     pairs: Optional[List[solu.james.Pair]] = None,
     cutoffs: Optional[List[float]] = None,
-) -> Dict[int, Dict[int, List[List[int]]]]:
+) -> Tuple[Dict[int, Dict[int, List[List[int]]]], int]:
     """Gets ion pairs for each frame (System object) in a trajectory, sorting them according to length as well.
     Hydrogens are "ignored", in the sense that they are not saved as connections, although they are used in the
     hydrogen bond criterion. This reduces the number of connections in the UndirectedNetwork object.
@@ -46,16 +47,20 @@ def get_ion_pairs_time_series(
         cutoffs (Optional[List[float]], optional): Cutoffs for finding distance-based bonds. Defaults to None.
 
     Returns:
-        Dict[int, Dict[int, List[List[int]]]]: Contains the time series information about ion pairs, such that
+        Tuple[Dict[int, Dict[int, List[List[int]]]], int]: The dictionary contains the time series information about ion pairs, such that
         the keys of the outer dictionary are the timesteps, and the inner dictionaries contain information about
         the ion pairs per timestep. The keys of the inner dictionary are the lengths of the ion pairs, and the
         values are lists of lists corresponding to the ion pairs.
+        The second member of the tuple is the number of atoms (or max number of atoms) if the number of atoms changes
+        per timestep.
     """
     output_dict = {}  # contains the ion pairs
+    natoms_arr = np.zeros(len(systems))
 
-    for system, timestep in zip(systems, timesteps):
+    for i, (system, timestep) in enumerate(zip(systems, timesteps)):
         ion_pair_list = []
         n_atoms = system.n_atoms()
+        natoms_arr[i] = n_atoms
         # Construct the network and fill it with bonds (distance-based and hydrogen bonds)
         network = solu.graphlib.UndirectedNetwork(n_atoms)
 
@@ -99,4 +104,20 @@ def get_ion_pairs_time_series(
             groups.setdefault(len(ion_pair), []).append(ion_pair)
         output_dict[timestep] = groups
 
-    return output_dict
+    return output_dict, np.max(natoms_arr)
+
+
+def network_from_ion_pairs(
+    ion_pair_info: Dict[int, List[List[int]]], ion_pair_length: int
+) -> solu.graphlib.UndirectedNetwork:
+    """Generates a network with the connectivity information of the two end points of ion pairs of a
+      prescribed length, at a particular timestep
+
+    Args:
+        ion_pair_info (Dict[int, List[List[int]]]): Keys are the lengths of ion pairs, and the values are
+        ion_pair_length (int): _description_
+
+    Returns:
+        solu.graphlib.UndirectedNetwork: _description_
+    """
+    pass
