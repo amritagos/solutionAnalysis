@@ -270,22 +270,75 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
         return images[index], timesteps[index]
     else:
         return [images[index]], [timesteps[index]]
+       
+def save_system_to_hdf5(system: solu.james.System, hdf5_group: h5py.Group):
+    """Save a System object to an HDF5 group.
 
+    Args:
+        system (solu.james.System): System object to serialize
+        hdf5_group (h5py.Group): The HDF5 group to be saved to
+    """
+    
+    atom_ids = np.array([atom.id for atom in system.atoms], dtype=np.int32)
+    atom_types = np.array([atom.type for atom in system.atoms], dtype=np.int32)
+    mol_ids = np.array([atom.id if atom.mol_id is None else atom.mol_id for atom in system.atoms], dtype=np.int32)
+    positions = np.array([atom.position for atom in system.atoms], dtype=np.float64)
+    
+    hdf5_group.create_dataset("atom_ids", data=atom_ids)
+    hdf5_group.create_dataset("atom_types", data=atom_types)
+    hdf5_group.create_dataset("mol_ids", data=mol_ids)
+    hdf5_group.create_dataset("positions", data=positions)
+    
+    if system.box is not None:
+        hdf5_group.create_dataset("box", data=np.array(system.box, dtype=np.float64))
+    if system.boxLo is not None:
+        hdf5_group.create_dataset("boxLo", data=np.array(system.boxLo, dtype=np.float64))
+
+def read_system_from_hdf5(hdf5_group: h5py.Group) -> solu.james.System:
+    """Read a System object from an HDF5 group.
+
+    Args:
+        hdf5_group (h5py.Group): HDF5 group, from which the System object will be reconstructed
+
+    Returns:
+        solu.james.System: Reconstructed System object
+    """
+    atom_ids = hdf5_group["atom_ids"][:]
+    atom_types = hdf5_group["atom_types"][:]
+    mol_ids = hdf5_group["mol_ids"][:]
+    positions = hdf5_group["positions"][:]
+    
+    # Reconstruct atoms list
+    atoms = [solu.james.Atom(atom_id, atom_type, mol_id, position)
+             for atom_id, atom_type, mol_id, position in zip(atom_ids, atom_types, mol_ids, positions)]
+    
+    # Read optional attributes
+    box = hdf5_group["box"][:] if "box" in hdf5_group else None
+    boxLo = hdf5_group["boxLo"][:] if "boxLo" in hdf5_group else None
+    
+    # Reconstruct the System object
+    system = solu.james.System(atoms, box, boxLo)
+    
+    return system
 
 def save_ion_pairs_to_hdf5(
     file_path: Path,
     time_series_dict: Dict[int, Dict[int, List[List[int]]]],
+    system: solu.james.System,
     max_depth: int,
     write_identifier: solu.james.WriteIdentifier,
-    n_atoms: int,
     **compression_kwargs: Union[str, int],
 ) -> None:
     """Save the ion pairs per time step, sorted according to length into an HDF5 file.
 
     Args:
-        time_series_dict (Dict[int, Dict[int, List[List[int]]]]): Dictionary containing timesteps and ion pairs
+        file_path (Path): File path of the HDF5 file to write to 
+        time_series_dict (Dict[int, Dict[int, List[List[int]]]]): Dictionary containing timesteps and ion pairs.
+        The keys of the outer dictionary are timesteps, and the keys of the inner dictionary are ion pair lengths
+        system (solu.james.System): Representative System object, containing indices, atom IDs, atom types, molecular IDs
         max_depth (int): Maximum length of the ion pair
-        write_identifier (str): Corresponds to an enum class which describes whether the elements correspond to atom IDs or indices in the System object.
+        write_identifier (solu.james.WriteIdentifier): enum class which describes whether the elements correspond to 
+        atom IDs or indices in the System object.
         compression_kwargs(Union[str, int]): additional compression options for the create_dataset command in h5py.
         For instance, compression="gzip" and compression_opts=4
     """
@@ -296,14 +349,15 @@ def save_ion_pairs_to_hdf5(
         # Save metadata
         file.attrs["max_depth"] = max_depth
         file.attrs["writeIdentifier"] = str(write_identifier)  # convert enum to string
-        file.attrs["n_atoms"] = (
-            n_atoms  # Number of atoms in the system (assuming this does not change, or should be the maximum)
-        )
 
         # Save the timesteps as a separate dataset
         file.create_dataset(
             "timesteps", data=np.array(timesteps, dtype=np.int32), **compression_kwargs
         )
+
+        # Save the System object
+        system_group = file.create_group("system")
+        save_system_to_hdf5(system, system_group)
 
         # Now save the ion pairs per timestep into separate groups (each length would be in a different group)
         for timestep in timesteps:
@@ -330,9 +384,9 @@ def read_ion_paird_from_hdf5(
 ) -> Tuple[
     Dict[int, Dict[int, List[List[int]]]],
     List[int],
+    solu.james.System,
     int,
-    solu.james.WriteIdentifier,
-    int,
+    solu.james.WriteIdentifier
 ]:
     """Reads the HDF5 file and reconstructs a dictionary with the time series information about the ion pairs
 
@@ -343,9 +397,9 @@ def read_ion_paird_from_hdf5(
         Tuple[Dict[int, Dict[int, List[List[int]]]], List[int], int, solu.james.WriteIdentifier]: A tuple containing
         1) the dictionary with the ion pairs,
         2) timesteps,
-        3) max_depth,
-        4) writeIdentifier
-        5) n_atoms
+        3) System object
+        4) max_depth,
+        5) writeIdentifier
     """
     time_series_dict = {}
 
@@ -358,10 +412,13 @@ def read_ion_paird_from_hdf5(
         # Read the metadata
         max_depth = file.attrs["max_depth"]
         identifier_str = file.attrs["writeIdentifier"]
-        n_atoms = file.attrs["n_atoms"]
 
         # Read the timesteps
         timesteps = file["timesteps"][:].tolist()
+
+        # Read the representative System object
+        system_group = file["system"]
+        system = read_system_from_hdf5(system_group)
 
         # Iterate over the timesteps
         for timestep in timesteps:
@@ -384,7 +441,7 @@ def read_ion_paird_from_hdf5(
         return (
             time_series_dict,
             timesteps,
+            system,
             max_depth,
             enum_mapping.get(identifier_str),
-            n_atoms,
         )

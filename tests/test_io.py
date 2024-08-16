@@ -106,7 +106,7 @@ def test_read_lammps_dump(octahedral_system):
         assert atom.mol_id == mol_id_expected
 
 
-def test_hdf5_files():
+def test_hdf5_files(octahedral_system):
     """Tests whether you can output the time series information of the ion pairs to an HDF5 file format. The keys are timesteps, and the values are are a dictionary corresponding to ion pais (sorted by length, which are the keys at that timestep"""
     # Sample output dictionary for a time series of ion pairs
     time_series_data = {
@@ -114,18 +114,18 @@ def test_hdf5_files():
         200: {2: [[5, 1]]},
     }
     timesteps = [100, 200]
+    systems, times = octahedral_system
 
     test_dir = Path(__file__).resolve().parent
     file_path = test_dir / "output_ion_pairs.h5"
     max_depth = 3
     write_identifier = solu.james.WriteIdentifier.AtomID
-    n_atoms = 22
 
     solu.io.save_ion_pairs_to_hdf5(
-        file_path, time_series_data, max_depth, write_identifier, n_atoms
+        file_path, time_series_data, systems[0], max_depth, write_identifier
     )
 
-    time_series_read, timesteps_read, max_depth_read, identifier_read, n_atoms_read = (
+    time_series_read, timesteps_read, system_read, max_depth_read, identifier_read = (
         solu.io.read_ion_paird_from_hdf5(file_path)
     )
 
@@ -133,4 +133,5 @@ def test_hdf5_files():
     assert timesteps_read == timesteps
     assert max_depth_read == max_depth
     assert identifier_read == write_identifier
-    assert n_atoms_read == n_atoms
+    assert system_read.collect_ids() == systems[0].collect_ids()
+    assert system_read.boxLo == systems[0].boxLo
