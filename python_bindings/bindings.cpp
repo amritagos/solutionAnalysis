@@ -73,7 +73,9 @@ PYBIND11_MODULE(james, m) {
            "the minimum image convention if the box has been defined.")
       .def("find_atoms_in_molecule",
            &James::Atoms::System::find_atoms_in_molecule,
-           "Finds all indices in atoms such that the molecule ID is the same");
+           "Finds all indices in atoms such that the molecule ID is the same")
+      .def("index_from_id", &James::Atoms::System::index_from_id,
+           "Gets the index given the atom ID if it exists");
 
   // Bindings to commutative pair types and lambda binding to the function for
   // getting distance based bonds

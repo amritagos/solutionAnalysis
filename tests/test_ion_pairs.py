@@ -1,7 +1,10 @@
 import pytest
 import soluanalysis as solu
 from pathlib import Path
-from soluanalysis.ion_pairs import get_ion_pairs_time_series
+from soluanalysis.ion_pairs import (
+    get_ion_pairs_time_series,
+    get_end_point_indices_ion_pair,
+)
 
 
 def test_ion_pairs(octahedral_system):
@@ -99,3 +102,7 @@ def test_ion_pairs(octahedral_system):
     )
     assert out_dict_fn == output_dict
     assert n_atoms_fn == 22
+
+    # Test that you can get the end point (indices) of an ion pair
+    end_point_indices = get_end_point_indices_ion_pair([2, 11, 1], identifier, system)
+    assert end_point_indices == (1, 0)

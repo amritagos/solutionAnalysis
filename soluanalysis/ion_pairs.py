@@ -107,17 +107,59 @@ def get_ion_pairs_time_series(
     return output_dict, np.max(natoms_arr)
 
 
+def get_end_point_indices_ion_pair(
+    ion_pair: List[int],
+    identifier: solu.james.WriteIdentifier,
+    system: solu.james.System,
+) -> Tuple[int, int]:
+    """Obtain the indices (in the System object, and therefore in the UndirectedNetwork object) of the end points of the ion pair (which are connected)
+
+    Args:
+        ion_pair (List[int]): The ion pair in question whose end points are required
+        identifier (solu.james.WriteIdentifier): Enum with a value that reveals whether the ion pair elements are indices or atom IDs
+        system (solu.james.System): Representative System object
+
+    Returns:
+        Tuple[int, int]: First index, last index
+    """
+    if len(ion_pair) < 2:
+        raise AttributeError("The length of the ion pair is less than 2")
+    ele_first = ion_pair[0]
+    ele_last = ion_pair[-1]
+
+    if identifier == solu.james.WriteIdentifier.AtomID:
+        index_first = system.index_from_id(ele_first)
+        index_last = system.index_from_id(ele_last)
+        if index_first is None or index_last is None:
+            raise Exception(f"The atom IDs {ele_first} and {ele_last} do not exist.\n")
+        else:
+            return index_first, index_last
+    # Atom indices are in the ion pairs
+    else:
+        return ele_first, ele_last
+
+
 def network_from_ion_pairs(
-    ion_pair_info: Dict[int, List[List[int]]], ion_pair_length: int
+    ion_pair_info: Dict[int, List[List[int]]],
+    ion_pair_length: int,
+    system: solu.james.System,
+    identifier: solu.james.WriteIdentifier,
 ) -> solu.graphlib.UndirectedNetwork:
     """Generates a network with the connectivity information of the two end points of ion pairs of a
       prescribed length, at a particular timestep
 
     Args:
-        ion_pair_info (Dict[int, List[List[int]]]): Keys are the lengths of ion pairs, and the values are
-        ion_pair_length (int): _description_
+        ion_pair_info (Dict[int, List[List[int]]]): Keys are the lengths of ion pairs,
+        and the values are lists of lists (corresponding to ion pairs)
+        ion_pair_length (int): The desired length for the ion pairs (other ion pairs will be ignored)
+        system (solu.james.System): _description_
+        identifier (solu.james.WriteIdentifier): _description_
 
     Returns:
-        solu.graphlib.UndirectedNetwork: _description_
+        solu.graphlib.UndirectedNetwork: UndirectedNetwork object into
+        which the ion pair connectivity will be stored
     """
-    pass
+    # Initialize the UndirectedNetwork object
+    network = solu.graphlib.UndirectedNetwork(system.n_atoms())
+
+    return network
