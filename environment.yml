@@ -42,6 +42,8 @@ dependencies:
   - pybind11
   - meson-python
   - h5py
+  # Examples
+  - gdown
   - pip:
     # works for regular pip packages
     - lammps-logfile

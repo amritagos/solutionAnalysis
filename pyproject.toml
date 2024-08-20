@@ -16,9 +16,14 @@ requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.optional-dependencies]
+example = [
+    "gdown",
+]
+
 [project.urls]
-"Source Code" = "https://github.com/TheochemUI/pypotlib"
-"Bug Tracker" = "https://github.com/TheochemUI/pypotlib/issues"
+"Source Code" = "https://github.com/amritagos/solutionAnalysis"
+"Bug Tracker" = "https://github.com/amritagos/solutionAnalysis/issues"
 
 [build-system]
 requires = ["pybind11", "meson-python"]
