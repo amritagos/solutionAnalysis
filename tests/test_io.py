@@ -47,60 +47,91 @@ def test_write_read_single_dump(small_system):
     write_lammps_dump(file_path, small_system, timestep)
 
     # Read the file in to a new Systems object
-    system, timestep_read = read_lammps_dump(file_path)
+    systems, timesteps = read_lammps_dump(file_path)
 
-    assert system.atoms[0].mol_id == 31
-    assert system.n_atoms() == small_system.n_atoms()
+    assert systems[0].atoms[0].mol_id == 31
+    assert systems[0].n_atoms() == small_system.n_atoms()
+    assert timesteps[0] == timestep
 
 
-def test_read_lammps_dump():
+def test_read_lammps_dump(octahedral_system):
     """
     Tests whether you can read in a trajectory into a list of System objects
-    """
 
-    test_dir = Path(__file__).resolve().parent
-    infilename = test_dir / "../resources/oct.lammpstrj"
+    octahedral_system (tuple[List[System], List[int]]): a list of System objects and a list of timesteps, corresponding to the octahedral system
+    """
     # Read in the trajectory
-    # Since this is a single frame, there is just one System object
-    atoms, timesteps = read_lammps_dump(infilename)
+    # Since this is a single frame, there is just one System object in the list
+    atoms, timesteps = octahedral_system
 
     # There is only one timestep
-    assert timesteps == 0
+    assert timesteps[0] == 0
 
     # The number of atoms should be correct
-    assert atoms.n_atoms() == 22
+    assert atoms[0].n_atoms() == 22
 
     # Check the box size and lower box limits
-    assert atoms.box == [49.4752565268, 49.4752565268, 49.4752565268]
-    assert atoms.boxLo == [-12.457628299, -12.457628299, -12.457628299]
+    assert atoms[0].box == [49.4752565268, 49.4752565268, 49.4752565268]
+    assert atoms[0].boxLo == [-12.457628299, -12.457628299, -12.457628299]
 
     # Check that the positions were properly added
-    assert atoms.atoms[-1].position == [25.1689, 20.8364, 22.0004]
+    assert atoms[0].atoms[-1].position == [28.8714, 21.5182, 20.8169]
 
     # Check that the molecule IDs are correct
     mol_ids_desired = [
-        333,
-        333,
-        333,
         521,
-        687,
-        687,
-        687,
         1627,
-        1683,
-        1683,
-        1683,
-        1924,
-        1924,
-        1924,
-        2319,
-        2319,
-        2319,
-        3273,
-        3273,
-        3273,
         3968,
         4099,
+        333,
+        333,
+        333,
+        687,
+        687,
+        687,
+        1683,
+        1683,
+        1683,
+        1924,
+        1924,
+        1924,
+        2319,
+        2319,
+        2319,
+        3273,
+        3273,
+        3273,
     ]
-    for atom, mol_id_expected in zip(atoms.atoms, mol_ids_desired):
+    for atom, mol_id_expected in zip(atoms[0].atoms, mol_ids_desired):
         assert atom.mol_id == mol_id_expected
+
+
+def test_hdf5_files(octahedral_system):
+    """Tests whether you can output the time series information of the ion pairs to an HDF5 file format. The keys are timesteps, and the values are are a dictionary corresponding to ion pais (sorted by length, which are the keys at that timestep"""
+    # Sample output dictionary for a time series of ion pairs
+    time_series_data = {
+        100: {2: [[5, 1]], 3: [[2, 11, 1], [3, 5, 1], [4, 14, 1]]},
+        200: {2: [[5, 1]]},
+    }
+    timesteps = [100, 200]
+    systems, times = octahedral_system
+
+    test_dir = Path(__file__).resolve().parent
+    file_path = test_dir / "output_ion_pairs.h5"
+    max_depth = 3
+    write_identifier = solu.james.WriteIdentifier.AtomID
+
+    solu.io.save_ion_pairs_to_hdf5(
+        file_path, time_series_data, systems[0], max_depth, write_identifier
+    )
+
+    time_series_read, timesteps_read, system_read, max_depth_read, identifier_read = (
+        solu.io.read_ion_paird_from_hdf5(file_path)
+    )
+
+    assert time_series_read == time_series_data
+    assert timesteps_read == timesteps
+    assert max_depth_read == max_depth
+    assert identifier_read == write_identifier
+    assert system_read.collect_ids() == systems[0].collect_ids()
+    assert system_read.boxLo == systems[0].boxLo

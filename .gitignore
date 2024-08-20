@@ -1,3 +1,13 @@
+# Test outputs that don't need to be committed
+tests/test_single_frame.lammpstrj
+tests/output_ion_pairs.h5
+
+# Input trajectoru files for the examples (too big)
+examples/hydrogen_bond_tcf/input
+
+# Subproject dependency wrap file for graph_lib not needed 
+subprojects/graph_lib.wrap
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

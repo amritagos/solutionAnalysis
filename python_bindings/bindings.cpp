@@ -12,8 +12,11 @@
 #include <utility>
 
 // Basics
+#include "bondfinder.hpp"
 #include "directed_network.hpp"
 #include "network_base.hpp"
+#include "pairtypes.hpp"
+#include "pathfinder.hpp"
 #include "system.hpp"
 #include "undirected_network.hpp"
 // Bindings
@@ -25,6 +28,24 @@
 using namespace std::string_literals; // For ""s
 using namespace pybind11::literals;   // For ""_a
 namespace py = pybind11;              // Convention
+
+// Wrapper functions
+namespace Graph::Wrappers {
+// Wrapper function for get_neighbours
+std::vector<size_t> get_neighbours_wrapper(const NetworkBase<double> &obj,
+                                           std::size_t agent_idx) {
+  std::span<const size_t> neighbours = obj.get_neighbours(agent_idx);
+  return std::vector<size_t>(neighbours.begin(), neighbours.end());
+}
+
+// Wrapper function for get_weights
+std::vector<double> get_weights_wrapper(const NetworkBase<double> &obj,
+                                        std::size_t agent_idx) {
+  std::span<const double> weights = obj.get_weights(agent_idx);
+  return std::vector<double>(weights.begin(), weights.end());
+}
+
+} // namespace Graph::Wrappers
 
 PYBIND11_MODULE(james, m) {
   m.doc() = "Python bindings for james"; // optional module docstring
@@ -70,7 +91,55 @@ PYBIND11_MODULE(james, m) {
            "the minimum image convention if the box has been defined.")
       .def("find_atoms_in_molecule",
            &James::Atoms::System::find_atoms_in_molecule,
-           "Finds all indices in atoms such that the molecule ID is the same");
+           "Finds all indices in atoms such that the molecule ID is the same")
+      .def("index_from_id", &James::Atoms::System::index_from_id,
+           "Gets the index given the atom ID if it exists");
+
+  // Bindings to commutative pair types and lambda binding to the function for
+  // getting distance based bonds
+  py::class_<James::Bond::Pair>(m, "Pair", "Commutative pair class")
+      .def(py::init<int, int>(), py::arg("typeA"), py::arg("typeB"))
+      .def_readwrite("typeA", &James::Bond::Pair::typeA)
+      .def_readwrite("typeB", &James::Bond::Pair::typeB)
+      .def(py::self == py::self);
+
+  m.def("add_distance_based_bonds", [](Graph::NetworkBase<double> &network,
+                                       const James::Atoms::System &system,
+                                       std::vector<James::Bond::Pair> &pairs,
+                                       std::vector<double> &cutoffs) {
+    return James::Bond::add_distance_based_bonds<double>(network, system, pairs,
+                                                         cutoffs);
+  });
+  // Binding for the templated function add_hbonds. This is templated on the
+  // WeightType of the network
+  m.def("add_hbonds",
+        [](Graph::NetworkBase<double> &network,
+           const James::Atoms::System &system,
+           const std::vector<int> &donor_atom_types,
+           const std::vector<int> &acceptor_atom_types,
+           const std::vector<int> &h_atom_types, double cutoff_distance = 3.2,
+           double max_angle_deg = 30, bool ignore_hydrogens = true) {
+          return James::Bond::add_hbonds<double>(
+              network, system, donor_atom_types, acceptor_atom_types,
+              h_atom_types, cutoff_distance, max_angle_deg, ignore_hydrogens);
+        });
+  // Binding for the templated function find_ion_pairs. Templated on the
+  // WeightType of the network
+  m.def("find_ion_pairs", [](size_t source, Graph::NetworkBase<double> &network,
+                             const James::Atoms::System &system,
+                             const std::vector<int> &destination_atom_types,
+                             const std::vector<int> &intermediate_atom_types,
+                             std::optional<int> max_depth,
+                             James::Path::WriteIdentifier identifier =
+                                 James::Path::WriteIdentifier::AtomID) {
+    return James::Path::find_ion_pairs<double>(
+        source, network, system, destination_atom_types,
+        intermediate_atom_types, max_depth, identifier);
+  });
+  // Binding for enum class WriteIdentifier
+  py::enum_<James::Path::WriteIdentifier>(m, "WriteIdentifier")
+      .value("AtomID", James::Path::WriteIdentifier::AtomID)
+      .value("Index", James::Path::WriteIdentifier::Index);
 }
 
 PYBIND11_MODULE(graphlib, m) {
@@ -79,6 +148,10 @@ PYBIND11_MODULE(graphlib, m) {
   py::class_<Graph::NetworkBase<double>> give_me_a_name(
       m, "NetworkBase",
       "An abstract base class for undirected and directed networks");
+
+  // Binding to wrapper function to get neighbours
+  m.def("get_neighbours", &Graph::Wrappers::get_neighbours_wrapper,
+        "Gives a view into the neighbour indices connected to node index");
 
   py::class_<Graph::UndirectedNetwork<double>, Graph::NetworkBase<double>>(
       m, "UndirectedNetwork",
@@ -96,10 +169,6 @@ PYBIND11_MODULE(graphlib, m) {
            py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::UndirectedNetwork<double>::clear,
            "Clears the network")
-      .def("get_neighbours", &Graph::UndirectedNetwork<double>::get_neighbours,
-           "Gives a view into the neighbour indices connected to node index")
-      .def("get_weights", &Graph::UndirectedNetwork<double>::get_weights,
-           "Gives a view into the edge weights connected to node index")
       .def("set_edge_weight",
            &Graph::UndirectedNetwork<double>::set_edge_weight,
            "Sets the weight for a node index, for an existing neighbour index")
@@ -141,10 +210,6 @@ PYBIND11_MODULE(graphlib, m) {
            py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::DirectedNetwork<double>::clear,
            "Clears the network")
-      .def("get_neighbours", &Graph::DirectedNetwork<double>::get_neighbours,
-           "Gives a view into the neighbour indices connected to node index")
-      .def("get_weights", &Graph::DirectedNetwork<double>::get_weights,
-           "Gives a view into the edge weights connected to node index")
       .def("set_edge_weight", &Graph::DirectedNetwork<double>::set_edge_weight,
            "Sets the weight for a node index, for an existing neighbour index")
       .def("get_edge_weight", &Graph::DirectedNetwork<double>::get_edge_weight,
