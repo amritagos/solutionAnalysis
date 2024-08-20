@@ -18,7 +18,7 @@ def get_ion_pairs_time_series(
     max_angle_deg: float = 30,
     pairs: Optional[List[solu.james.Pair]] = None,
     cutoffs: Optional[List[float]] = None,
-) -> Tuple[Dict[int, Dict[int, List[List[int]]]], int]:
+) -> Dict[int, Dict[int, List[List[int]]]]:
     """Gets ion pairs for each frame (System object) in a trajectory, sorting them according to length as well.
     Hydrogens are "ignored", in the sense that they are not saved as connections, although they are used in the
     hydrogen bond criterion. This reduces the number of connections in the UndirectedNetwork object.
@@ -47,20 +47,16 @@ def get_ion_pairs_time_series(
         cutoffs (Optional[List[float]], optional): Cutoffs for finding distance-based bonds. Defaults to None.
 
     Returns:
-        Tuple[Dict[int, Dict[int, List[List[int]]]], int]: The dictionary contains the time series information about ion pairs, such that
+        Dict[int, Dict[int, List[List[int]]]]: The dictionary contains the time series information about ion pairs, such that
         the keys of the outer dictionary are the timesteps, and the inner dictionaries contain information about
         the ion pairs per timestep. The keys of the inner dictionary are the lengths of the ion pairs, and the
         values are lists of lists corresponding to the ion pairs.
-        The second member of the tuple is the number of atoms (or max number of atoms) if the number of atoms changes
-        per timestep.
     """
     output_dict = {}  # contains the ion pairs
-    natoms_arr = np.zeros(len(systems))
 
     for i, (system, timestep) in enumerate(zip(systems, timesteps)):
         ion_pair_list = []
         n_atoms = system.n_atoms()
-        natoms_arr[i] = n_atoms
         # Construct the network and fill it with bonds (distance-based and hydrogen bonds)
         network = solu.graphlib.UndirectedNetwork(n_atoms)
 
@@ -104,7 +100,7 @@ def get_ion_pairs_time_series(
             groups.setdefault(len(ion_pair), []).append(ion_pair)
         output_dict[timestep] = groups
 
-    return output_dict, np.max(natoms_arr)
+    return output_dict
 
 
 def get_end_point_indices_ion_pair(
