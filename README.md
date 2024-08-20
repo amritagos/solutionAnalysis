@@ -10,7 +10,7 @@ micromamba activate soluenv
 rm -rf subprojects 
 git restore subprojects
 meson setup build --wipe
-pip install -e . --no-build-isolation
+pip install -e . #--no-build-isolation
 ```
 
 ## Usage
