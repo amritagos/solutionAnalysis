@@ -29,6 +29,24 @@ using namespace std::string_literals; // For ""s
 using namespace pybind11::literals;   // For ""_a
 namespace py = pybind11;              // Convention
 
+// Wrapper functions
+namespace Graph::Wrappers {
+// Wrapper function for get_neighbours
+std::vector<size_t> get_neighbours_wrapper(const NetworkBase<double> &obj,
+                                           std::size_t agent_idx) {
+  std::span<const size_t> neighbours = obj.get_neighbours(agent_idx);
+  return std::vector<size_t>(neighbours.begin(), neighbours.end());
+}
+
+// Wrapper function for get_weights
+std::vector<double> get_weights_wrapper(const NetworkBase<double> &obj,
+                                        std::size_t agent_idx) {
+  std::span<const double> weights = obj.get_weights(agent_idx);
+  return std::vector<double>(weights.begin(), weights.end());
+}
+
+} // namespace Graph::Wrappers
+
 PYBIND11_MODULE(james, m) {
   m.doc() = "Python bindings for james"; // optional module docstring
 
@@ -131,6 +149,10 @@ PYBIND11_MODULE(graphlib, m) {
       m, "NetworkBase",
       "An abstract base class for undirected and directed networks");
 
+  // Binding to wrapper function to get neighbours
+  m.def("get_neighbours", &Graph::Wrappers::get_neighbours_wrapper,
+        "Gives a view into the neighbour indices connected to node index");
+
   py::class_<Graph::UndirectedNetwork<double>, Graph::NetworkBase<double>>(
       m, "UndirectedNetwork",
       "A class that represents an undirected graph using adjacency lists")
@@ -147,10 +169,6 @@ PYBIND11_MODULE(graphlib, m) {
            py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::UndirectedNetwork<double>::clear,
            "Clears the network")
-      .def("get_neighbours", &Graph::UndirectedNetwork<double>::get_neighbours,
-           "Gives a view into the neighbour indices connected to node index")
-      .def("get_weights", &Graph::UndirectedNetwork<double>::get_weights,
-           "Gives a view into the edge weights connected to node index")
       .def("set_edge_weight",
            &Graph::UndirectedNetwork<double>::set_edge_weight,
            "Sets the weight for a node index, for an existing neighbour index")
@@ -192,10 +210,6 @@ PYBIND11_MODULE(graphlib, m) {
            py::arg("agent_idx") = std::nullopt)
       .def("clear", &Graph::DirectedNetwork<double>::clear,
            "Clears the network")
-      .def("get_neighbours", &Graph::DirectedNetwork<double>::get_neighbours,
-           "Gives a view into the neighbour indices connected to node index")
-      .def("get_weights", &Graph::DirectedNetwork<double>::get_weights,
-           "Gives a view into the edge weights connected to node index")
       .def("set_edge_weight", &Graph::DirectedNetwork<double>::set_edge_weight,
            "Sets the weight for a node index, for an existing neighbour index")
       .def("get_edge_weight", &Graph::DirectedNetwork<double>::get_edge_weight,

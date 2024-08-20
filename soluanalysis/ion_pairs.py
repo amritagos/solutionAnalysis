@@ -148,8 +148,8 @@ def network_from_ion_pairs(
         ion_pair_info (Dict[int, List[List[int]]]): Keys are the lengths of ion pairs,
         and the values are lists of lists (corresponding to ion pairs)
         ion_pair_length (int): The desired length for the ion pairs (other ion pairs will be ignored)
-        system (solu.james.System): _description_
-        identifier (solu.james.WriteIdentifier): _description_
+        system (solu.james.System): Representative System object for the frame
+        identifier (solu.james.WriteIdentifier): Enum with a value that reveals whether the ion pair elements are indices or atom IDs
 
     Returns:
         solu.graphlib.UndirectedNetwork: UndirectedNetwork object into
@@ -157,5 +157,50 @@ def network_from_ion_pairs(
     """
     # Initialize the UndirectedNetwork object
     network = solu.graphlib.UndirectedNetwork(system.n_atoms())
+    weight_edge = 1
 
+    # Get the ion pairs corresponding to the desired ion pair length
+    for ion_pair in ion_pair_info.get(ion_pair_length) or []:
+        index_first, index_last = get_end_point_indices_ion_pair(
+            ion_pair, identifier, system
+        )
+        network.push_back_neighbour_and_weight(index_first, index_last, weight_edge)
+    # Network corresponding to desired ion pair length
     return network
+
+
+def networks_from_ion_pair_series(
+    ion_pair_series: Dict[int, Dict[int, List[List[int]]]],
+    ion_pair_length: int,
+    system: solu.james.System,
+    identifier: solu.james.WriteIdentifier,
+) -> List[solu.graphlib.UndirectedNetwork]:
+    """Generates a list of networks with the connectivity information of the two end points of ion pairs of a
+      prescribed length, for a time series
+
+    Args:
+        ion_pair_series (Dict[int, Dict[int, List[List[int]]]]): Contains the time series information about ion pairs, such that
+        the keys of the outer dictionary are the timesteps, and the inner dictionaries contain information about
+        the ion pairs per timestep. The keys of the inner dictionary are the lengths of the ion pairs, and the
+        values are lists of lists corresponding to the ion pairs.
+        ion_pair_length (int): The desired length for the ion pairs (other ion pairs will be ignored)
+        system (solu.james.System): Representative System object containing the number of atoms, atom ID information etc.
+        identifier (solu.james.WriteIdentifier): Enum with a value that reveals whether the ion pair elements are indices or atom IDs
+
+    Returns:
+        List[solu.graphlib.UndirectedNetwork]: List of UndirectedNetwork objects containing
+        ion pair connectivity information
+    """
+    # Extract timesteps from the keys of time_series_dict and sort
+    timesteps = sorted(ion_pair_series.keys())
+    # Output list with UndirectedNetwork objects
+    network_series = []
+
+    for timestep in timesteps:
+        network_series.append(
+            network_from_ion_pairs(
+                ion_pair_series[timestep], ion_pair_length, system, identifier
+            )
+        )
+
+    return network_series

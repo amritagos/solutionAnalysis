@@ -4,6 +4,7 @@ from pathlib import Path
 from soluanalysis.ion_pairs import (
     get_ion_pairs_time_series,
     get_end_point_indices_ion_pair,
+    networks_from_ion_pair_series,
 )
 
 
@@ -105,3 +106,14 @@ def test_ion_pairs(octahedral_system):
     # Test that you can get the end point (indices) of an ion pair
     end_point_indices = get_end_point_indices_ion_pair([2, 11, 1], identifier, system)
     assert end_point_indices == (1, 0)
+
+    # Get the networks from the ion pair time series
+    # Use the max_depth as the ion pair length
+    networks_read = networks_from_ion_pair_series(
+        out_dict_fn, max_depth, systems[0], identifier
+    )
+    # Test that the network is correct
+    # The Atom (with index 0 and atom ID 1) should have 3 neighbours (all indices)
+    neighbours_expected = [1, 2, 3]
+    neighbours = solu.graphlib.get_neighbours(networks_read[0], 0)
+    assert neighbours == neighbours_expected
