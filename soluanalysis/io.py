@@ -205,6 +205,7 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
     Args:
         file_path (pathlib.Path): Path to the LAMMPS trajectory file.
         index: integer or slice object (by default, gets the last timestep)
+        index=':' or index=slice(None) : all
 
     Returns:
         List[System], List[int]: A list of System objects representing each frame in the trajectory within the specified range, and a list of timesteps read from the LAMMPS dump file.
@@ -214,6 +215,9 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
     box_bounds = None
     lower_box_limits = None
     timesteps = []
+
+    if index is None or index == ':':
+        index = slice(None, None, None)
 
     try:
         with open(file_path, "r") as file:
