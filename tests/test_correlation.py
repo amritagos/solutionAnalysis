@@ -33,6 +33,24 @@ def create_network_list():
     network.push_back_neighbour_and_weight(1, 3, weight_edge)
     network.push_back_neighbour_and_weight(2, 3, weight_edge)
     network_list.append(network)
+    # Fourth time step
+    network = solu.graphlib.UndirectedNetwork(n_atoms)
+    network.push_back_neighbour_and_weight(1, 2, weight_edge)
+    network.push_back_neighbour_and_weight(1, 3, weight_edge)
+    network.push_back_neighbour_and_weight(2, 3, weight_edge)
+    network_list.append(network)
+    # 5th time step
+    network = solu.graphlib.UndirectedNetwork(n_atoms)
+    network.push_back_neighbour_and_weight(1, 2, weight_edge)
+    network.push_back_neighbour_and_weight(1, 3, weight_edge)
+    network.push_back_neighbour_and_weight(2, 3, weight_edge)
+    network_list.append(network)
+    # 6th time step
+    network = solu.graphlib.UndirectedNetwork(n_atoms)
+    network.push_back_neighbour_and_weight(1, 2, weight_edge)
+    network.push_back_neighbour_and_weight(1, 3, weight_edge)
+    network.push_back_neighbour_and_weight(2, 3, weight_edge)
+    network_list.append(network)
 
     return network_list
 
@@ -43,16 +61,23 @@ def test_hbond_correlation():
     networks = create_network_list()
     # Check that the network list was created properly
     assert solu.graphlib.get_neighbours(networks[0], 0) == [1, 2, 3]
-    assert solu.graphlib.get_neighbours(networks[2], 0) == [1]
+    assert solu.graphlib.get_neighbours(networks[-1], 0) == []
 
     # Get the c_ij flattened array list for each timestep (there are three timesteps)
     c_ij_list = solu.james.bond_connection_info_time_series(networks, False)
-    c_ij_list_expected = [[1, 1, 1, 1, 1, 1], [1, 0, 1, 1, 1, 1], [1, 0, 0, 1, 1, 1]]
+    c_ij_list_expected = [
+        [1, 1, 1, 1, 1, 1],
+        [1, 0, 1, 1, 1, 1],
+        [1, 0, 0, 1, 1, 1],
+        [0, 0, 0, 1, 1, 1],
+        [0, 0, 0, 1, 1, 1],
+        [0, 0, 0, 1, 1, 1],
+    ]
     assert c_ij_list == c_ij_list_expected
 
     # Get the time correlation function
-    tau_values_expected = [0, 10]
-    tcf_avg_expected = [1.0, 0.8166666666666667]
+    tau_values_expected = [0, 10, 20]
+    tcf_avg_expected = [1.0, 0.7944444444444444, 0.6722222222222222]
     tau_values, tcf_avg, tcf_error = solu.james.time_correlation_function(
         c_ij_list, times, 0, 1, 1, None
     )

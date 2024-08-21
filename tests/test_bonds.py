@@ -46,7 +46,7 @@ def test_bond_formation(octahedral_system):
             h_atom_types,
             donor_acceptor_cutoff,
             max_angle_deg,
-            False,
+            True,
         )
         # There will be three hydrogen bonds formed between the donor (O) and acceptors (Cl)
         # Therefore there should be a total of 9 bonds
