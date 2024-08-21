@@ -152,7 +152,7 @@ PYBIND11_MODULE(james, m) {
   m.def("bond_connection_info_time_series",
         [](const std::vector<Graph::UndirectedNetwork<double>>
                &network_time_series,
-           bool continuous_bond = false) {
+           bool continuous_bond = true) {
           return James::Bond::Correlation::bond_connection_info_time_series<
               double>(network_time_series, continuous_bond);
         });
