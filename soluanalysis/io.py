@@ -216,7 +216,7 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
     lower_box_limits = None
     timesteps = []
 
-    if index is None or index == ':':
+    if index is None or index == ":":
         index = slice(None, None, None)
 
     try:
