@@ -63,23 +63,11 @@ def test_hbond_correlation():
     assert solu.graphlib.get_neighbours(networks[0], 0) == [1, 2, 3]
     assert solu.graphlib.get_neighbours(networks[-1], 0) == []
 
-    # Get the c_ij flattened array list for each timestep (there are three timesteps)
-    c_ij_list = solu.james.bond_connection_info_time_series(networks, False)
-    c_ij_list_expected = [
-        [1, 1, 1, 1, 1, 1],
-        [1, 0, 1, 1, 1, 1],
-        [1, 0, 0, 1, 1, 1],
-        [0, 0, 0, 1, 1, 1],
-        [0, 0, 0, 1, 1, 1],
-        [0, 0, 0, 1, 1, 1],
-    ]
-    assert c_ij_list == c_ij_list_expected
-
     # Get the time correlation function
     tau_values_expected = [0, 10, 20]
     tcf_avg_expected = [1.0, 0.7944444444444444, 0.6722222222222222]
     tau_values, tcf_avg, tcf_error = solu.james.time_correlation_function(
-        c_ij_list, times, 0, 1, 1, None
+        networks, times, 0, 1, 1, None
     )
     assert tau_values == tau_values_expected
     assert tcf_avg == tcf_avg_expected

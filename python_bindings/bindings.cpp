@@ -140,54 +140,46 @@ PYBIND11_MODULE(james, m) {
   py::enum_<James::Path::WriteIdentifier>(m, "WriteIdentifier")
       .value("AtomID", James::Path::WriteIdentifier::AtomID)
       .value("Index", James::Path::WriteIdentifier::Index);
-  // Binding for templated function bond_connection_info_at_tau. Templated on
-  // the WeightType of the network
-  m.def("bond_connection_info_at_tau",
-        [](const Graph::UndirectedNetwork<double> &network) {
-          return James::Bond::Correlation::bond_connection_info_at_tau<double>(
-              network);
-        });
-  // Binding for templated function bond_connection_info_time_series. Templated
-  // on the WeightType of the network
-  m.def("bond_connection_info_time_series",
-        [](const std::vector<Graph::UndirectedNetwork<double>>
-               &network_time_series,
-           bool continuous_bond = true) {
-          return James::Bond::Correlation::bond_connection_info_time_series<
-              double>(network_time_series, continuous_bond);
-        });
   // Binding for the templated time_correlation_function, which is templated on
-  // the value in the c_ij series (int for bonds, could be double too)
+  // the network type
+  // For a vector of UndirectedNetwork objects
   m.def(
       "time_correlation_function",
-      [](const std::vector<std::vector<int>> &c_ij_time_series,
+      [](const std::vector<Graph::UndirectedNetwork<double>>
+             &network_time_series,
          const std::vector<double> &time, int start_t0 = 0, int start_tau = 1,
-         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt) {
-        return James::Bond::Correlation::time_correlation_function<int>(
-            c_ij_time_series, time, start_t0, start_tau, delta_tau,
-            calc_upto_tau);
+         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt,
+         bool continuous_bond = true) {
+        return James::Bond::Correlation::time_correlation_function<
+            Graph::UndirectedNetwork<double>>(network_time_series, time,
+                                              start_t0, start_tau, delta_tau,
+                                              calc_upto_tau, continuous_bond);
       },
-      pybind11::arg("c_ij_time_series"), pybind11::arg("time"),
+      pybind11::arg("network_time_series"), pybind11::arg("time"),
       pybind11::arg("start_t0") = 0, pybind11::arg("start_tau") = 1,
       pybind11::arg("delta_tau") = 1,
       pybind11::arg("calc_upto_tau") = std::nullopt,
+      pybind11::arg("continuous_bond") = true,
       "Time correlation function returning tau values, the normalized "
       "correlation function values, and the standard error in the "
       "correlation function values.");
-  // Templated on double
+  // For a vector of DirectedNetwork objects
   m.def(
       "time_correlation_function",
-      [](const std::vector<std::vector<double>> &c_ij_time_series,
+      [](const std::vector<Graph::DirectedNetwork<double>> &network_time_series,
          const std::vector<double> &time, int start_t0 = 0, int start_tau = 1,
-         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt) {
-        return James::Bond::Correlation::time_correlation_function<double>(
-            c_ij_time_series, time, start_t0, start_tau, delta_tau,
-            calc_upto_tau);
+         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt,
+         bool continuous_bond = true) {
+        return James::Bond::Correlation::time_correlation_function<
+            Graph::DirectedNetwork<double>>(network_time_series, time, start_t0,
+                                            start_tau, delta_tau, calc_upto_tau,
+                                            continuous_bond);
       },
-      pybind11::arg("c_ij_time_series"), pybind11::arg("time"),
+      pybind11::arg("network_time_series"), pybind11::arg("time"),
       pybind11::arg("start_t0") = 0, pybind11::arg("start_tau") = 1,
       pybind11::arg("delta_tau") = 1,
       pybind11::arg("calc_upto_tau") = std::nullopt,
+      pybind11::arg("continuous_bond") = true,
       "Time correlation function returning tau values, the normalized "
       "correlation function values, and the standard error in the "
       "correlation function values.");
