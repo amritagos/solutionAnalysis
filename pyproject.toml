@@ -19,6 +19,8 @@ license = {text = "MIT"}
 [project.optional-dependencies]
 example = [
     "gdown",
+    "spirit-extras",
+    "matplotlib"
 ]
 
 [project.urls]

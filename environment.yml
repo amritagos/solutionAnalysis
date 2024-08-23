@@ -44,6 +44,9 @@ dependencies:
   - h5py
   # Examples
   - gdown
+  - matplotlib
   - pip:
     # works for regular pip packages
     - lammps-logfile
+    # Required for plotting
+    - spirit-extras
