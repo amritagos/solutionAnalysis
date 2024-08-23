@@ -42,6 +42,7 @@ dependencies:
   - pybind11
   - meson-python
   - h5py
+  - scipy
   # Examples
   - gdown
   - matplotlib

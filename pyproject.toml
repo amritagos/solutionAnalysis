@@ -10,7 +10,8 @@ authors = [
 dependencies = [
     "ase >= 3.22.1",
     "numpy",
-    "h5py"
+    "h5py",
+    "scipy"
     ]
 requires-python = ">=3.10"
 readme = "README.md"

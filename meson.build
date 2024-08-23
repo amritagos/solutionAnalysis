@@ -56,7 +56,8 @@ py.install_sources([
 # IO and extras
 py.install_sources([
     'soluanalysis/io.py',
-    'soluanalysis/ion_pairs.py'
+    'soluanalysis/ion_pairs.py',
+    'soluanalysis/misc.py'
   ],
   pure: false,
   subdir: 'soluanalysis'

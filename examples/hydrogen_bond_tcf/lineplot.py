@@ -8,6 +8,7 @@ from os.path import isfile, join
 import matplotlib.patheffects as path_effects
 import matplotlib.lines as mlines
 from matplotlib.legend_handler import HandlerTuple
+from soluanalysis.misc import fit_biexponential
 
 def insert_inset(image_path, axis, rel_height, 
     rel_width, margin_x, margin_y, x_align, y_align):
@@ -90,14 +91,29 @@ tcf_val =  np.array(data[:,1]) # Time correlation function values
 tcf_val_err = np.array(data[:,2]) # Error bars for the TCF  
 
 # ---------------------------------------------
+# Curve fitting 
+# initial guess A, tau1, B, tau2
+params, fit_t, fit_ac, lifetime = fit_biexponential(tau_val, tcf_val, [0.5, 1, 1, 2])
+print("Lifetime is ", lifetime, "ps \n")
+A, tau1, B, tau2 = params
+# If A+B is around 1.01, the fit is bad even if it looks okay
+print(f"Sum A + B = {A+B} and should be 1.0\n")
+print(f"The time constants are {tau1} ps and {tau2} ps\n")
+# ---------------------------------------------
 ax1 = fig.add_subplot(gs[0,0])
 ax1.set_xlabel(r'$\tau$ (ps)')
 ax1.set_ylabel(r'$\mathrm{C_{HB}} (\tau)$',labelpad=7)  # we already handled the x-label with ax1
 
 # Data points and line for non-octahedral state 
-(tcf_1,) = ax1.plot(tau_val, tcf_val, marker=".", markersize=6,
-    color="orangered",markeredgecolor='black',markeredgewidth=0.6,zorder=4,
-    label=r'continuous bond')
+# (tcf_1,) = ax1.plot(tau_val, tcf_val, marker=".", markersize=6,
+#     color="orangered",markeredgecolor='black',markeredgewidth=0.6,zorder=4,
+#     label=r'Data')
+(tcf_1,) = ax1.plot(tau_val, tcf_val, marker=None,
+    color="orangered",zorder=4,
+    label=r'Data')
+(fit,) = ax1.plot(tau_val, tcf_val, marker=None,
+    color="grey",zorder=6, linestyle = '--',
+    label=r'Fit')
 # Shaded error region for non-octahedral states 
 ax1.fill_between(tau_val, tcf_val-tcf_val_err, tcf_val+tcf_val_err,linewidth=0.1,color="peachpuff", alpha=0.8,zorder=0)
 
@@ -113,9 +129,13 @@ ax1.set_xlim([0.0,10])
 
 # ---------------------------------------------------------------------
 
+# PLOT LABEL (lifetime)
+text = r'$\tau_C=$'+ "{:.2f} ps".format(lifetime)
+ax1.text(4, 0.4, text, fontsize=7.5)
+
 # LEGEND
 
-ax1.legend(handles=[tcf_1], fontsize=7.4)
+ax1.legend(handles=[tcf_1, fit], fontsize=7.4)
 
 # ---------------------------------------------------------------------
 
