@@ -92,12 +92,11 @@ tcf_val_err = np.array(data[:,2]) # Error bars for the TCF
 
 # ---------------------------------------------
 # Curve fitting 
-# initial guess A, tau1, B, tau2
-params, fit_t, fit_ac, lifetime = fit_biexponential(tau_val, tcf_val, [0.5, 1, 1, 2])
+# initial guess A, tau1, tau2
+params, fit_t, fit_ac, lifetime = fit_biexponential(tau_val, tcf_val, [0.5, 1, 2])
 print("Lifetime is ", lifetime, "ps \n")
-A, tau1, B, tau2 = params
+A, tau1, tau2 = params
 # If A+B is around 1.01, the fit is bad even if it looks okay
-print(f"Sum A + B = {A+B} and should be 1.0\n")
 print(f"The time constants are {tau1} ps and {tau2} ps\n")
 # ---------------------------------------------
 ax1 = fig.add_subplot(gs[0,0])
@@ -125,6 +124,7 @@ plt.axhline(y = 0.0, color = 'black', linestyle = '--', linewidth=1)
 # xtick_vec = np.append(xtick_vec, 2.25)
 # ax1.set_xticks(xtick_vec)
 # ax1.set_ylim([0.0,25])
+# ax1.set_yscale("log")
 ax1.set_xlim([0.0,10])
 
 # ---------------------------------------------------------------------

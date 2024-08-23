@@ -8,7 +8,7 @@ from typing import Union, List, Tuple
 
 
 def biexponential_model(
-    t: float, A: float, tau1: float, B: float, tau2: float
+    t: float, A: float, tau1: float, tau2: float
 ) -> float:
     """Fit data to a biexponential function (sum of two exponential decays). A and B should sum to 1.0
     C(t) = A*exp(-t/tau1) + B*exp(-t/tau2)
@@ -23,13 +23,13 @@ def biexponential_model(
     Returns:
         float: _description_
     """
-    return A * np.exp(-t / tau1) + B * np.exp(-t / tau2)
+    return A * np.exp(-t / tau1) + (1-A) * np.exp(-t / tau2)
 
 
 def fit_biexponential(
     tau_timeseries: Union[List[float], npt.NDArray],
     tcf_timeseries: Union[List[float], npt.NDArray],
-    initial_guess: Union[List[float], npt.NDArray] = [0.5, 1, 1, 2],
+    initial_guess: Union[List[float], npt.NDArray] = [0.5, 1, 2],
 ) -> Tuple[Tuple[float, float, float], npt.NDArray, npt.NDArray, float]:
     """Fit a biexponential function of the form (A*exp(-t/tau1) + B*exp(-t/tau2)) to the tau values and time autocorrelation function values (using the continuous bond definition).
     Using the relation from Gowers et al. (2015).
@@ -59,9 +59,9 @@ def fit_biexponential(
     fit_ac = biexponential_model(fit_t, *params)
 
     # Extract the parameters
-    A, tau1, B, tau2 = params
+    A, tau1, tau2 = params
 
     # Compute the lifetime
-    lifetime = A * tau1 + B * tau2
+    lifetime = A * tau1 + (1-A) * tau2
 
     return params, fit_t, fit_ac, lifetime
