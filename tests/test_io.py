@@ -2,6 +2,11 @@ import pytest
 from pathlib import Path
 import soluanalysis as solu
 from soluanalysis.io import read_lammps_dump, write_lammps_dump
+from soluanalysis.hdf5_io import (
+    read_ion_pairs_from_hdf5,
+    save_ion_pairs_to_hdf5,
+    save_system_to_hdf5,
+)
 
 
 @pytest.fixture
@@ -121,12 +126,12 @@ def test_hdf5_files(octahedral_system):
     max_depth = 3
     write_identifier = solu.james.WriteIdentifier.AtomID
 
-    solu.io.save_ion_pairs_to_hdf5(
+    save_ion_pairs_to_hdf5(
         file_path, time_series_data, systems[0], max_depth, write_identifier
     )
 
     time_series_read, timesteps_read, system_read, max_depth_read, identifier_read = (
-        solu.io.read_ion_paird_from_hdf5(file_path)
+        read_ion_pairs_from_hdf5(file_path)
     )
 
     assert time_series_read == time_series_data
