@@ -3,13 +3,20 @@ import numpy as np
 import numpy.typing as npt
 from typing import Union, List, Tuple
 
-"""Fit data to a biexponential function. A+B should be 1.0
-"""
+
+def string2index(stridx: str) -> Union[int, slice, str]:
+    """Convert index string to either int or slice. From ASE"""
+    if ":" not in stridx:
+        # may contain database accessor
+        try:
+            return int(stridx)
+        except ValueError:
+            return stridx
+    i = [None if s == "" else int(s) for s in stridx.split(":")]
+    return slice(*i)
 
 
-def biexponential_model(
-    t: float, A: float, tau1: float, tau2: float
-) -> float:
+def biexponential_model(t: float, A: float, tau1: float, tau2: float) -> float:
     """Fit data to a biexponential function (sum of two exponential decays). A and B should sum to 1.0
     C(t) = A*exp(-t/tau1) + B*exp(-t/tau2)
 
@@ -23,7 +30,7 @@ def biexponential_model(
     Returns:
         float: _description_
     """
-    return A * np.exp(-t / tau1) + (1-A) * np.exp(-t / tau2)
+    return A * np.exp(-t / tau1) + (1 - A) * np.exp(-t / tau2)
 
 
 def fit_biexponential(
@@ -62,6 +69,6 @@ def fit_biexponential(
     A, tau1, tau2 = params
 
     # Compute the lifetime
-    lifetime = A * tau1 + (1-A) * tau2
+    lifetime = A * tau1 + (1 - A) * tau2
 
     return params, fit_t, fit_ac, lifetime

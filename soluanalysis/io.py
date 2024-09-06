@@ -6,6 +6,18 @@ from os.path import splitext
 from soluanalysis.james import Atom, System
 import h5py
 import soluanalysis as solu
+import numbers
+from soluanalysis.misc import string2index
+
+
+def index2range(index, length):
+    """Convert slice or integer to range. From ASE
+
+    If index is an integer, range will contain only that integer."""
+    obj = range(length)[index]
+    if isinstance(obj, numbers.Integral):
+        obj = range(obj, obj + 1)
+    return obj
 
 
 def lammps_data_to_system(
@@ -216,8 +228,17 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
     lower_box_limits = None
     timesteps = []
 
+    if isinstance(index, str):
+        try:
+            index = string2index(index)
+        except ValueError:
+            pass
+
     if index is None or index == ":":
         index = slice(None, None, None)
+
+    if not isinstance(index, (slice, str)):
+        index = slice(index, (index + 1) or None)
 
     try:
         with open(file_path, "r") as file:
