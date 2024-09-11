@@ -37,6 +37,20 @@ def small_system():
     return system
 
 
+def test_read_slice():
+    """
+    Tests that you can read in a slice of frames from a trajectory file
+    """
+    test_dir = Path(__file__).resolve().parent
+    infilename = test_dir / "../resources/Fe3_water_cluster.lammpstrj"
+    # Read in the trajectory (the last index in the slice is non inclusive)
+    systems, timesteps = solu.io.read_lammps_dump(infilename, "1:3")
+
+    assert len(systems) == 2
+    assert timesteps == [5, 10]
+    assert systems[0].atoms[0].position == [22.4864, 31.2099, 29.1459]
+
+
 def test_write_read_single_dump(small_system):
     """
     Tests that you can write out and then read back in a System object containing two molecules.
