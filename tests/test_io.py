@@ -2,11 +2,7 @@ import pytest
 from pathlib import Path
 import soluanalysis as solu
 from soluanalysis.io import read_lammps_dump, write_lammps_dump
-from soluanalysis.hdf5_io import (
-    read_ion_pairs_from_hdf5,
-    save_ion_pairs_to_hdf5,
-    save_system_to_hdf5,
-)
+from soluanalysis.hdf5_io import read_ion_pairs_from_hdf5, save_ion_pairs_to_hdf5
 
 
 @pytest.fixture

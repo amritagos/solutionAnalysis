@@ -242,14 +242,14 @@ def read_lammps_dump(file_path: Path, index=-1) -> tuple[List[System], List[int]
     lower_box_limits = None
     timesteps = []
 
-    if index is None or index == ":":
-        index = slice(None, None, None)
-
     if isinstance(index, str):
         try:
             index = string2index(index)
         except ValueError:
             pass
+
+    if index is None or index == ":":
+        index = slice(None, None, None)
 
     if not isinstance(index, (slice, str)):
         index = slice(index, (index + 1) or None)
