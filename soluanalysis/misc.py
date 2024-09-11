@@ -16,7 +16,7 @@ def biexponential_model(t: float, A: float, tau1: float, tau2: float) -> float:
         tau2 (float): time constant
 
     Returns:
-        float: _description_
+        float: Result of the expression, used for fitting
     """
     return A * np.exp(-t / tau1) + (1 - A) * np.exp(-t / tau2)
 
