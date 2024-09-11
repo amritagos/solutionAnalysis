@@ -77,6 +77,8 @@ PYBIND11_MODULE(james, m) {
       .def_readwrite("boxLo", &James::Atoms::System::boxLo)
       .def("n_atoms", &James::Atoms::System::n_atoms)
       .def("collect_ids", &James::Atoms::System::collect_ids)
+      .def("collect_positions", &James::Atoms::System::collect_positions)
+      .def("reset_positions", &James::Atoms::System::reset_positions)
       .def("delete",
            static_cast<void (James::Atoms::System::*)(int)>(
                &James::Atoms::System::del),
