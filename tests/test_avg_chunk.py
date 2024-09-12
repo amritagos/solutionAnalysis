@@ -58,3 +58,12 @@ def test_average_frames():
 
     # Check that the timesteps are what are expected
     assert timesteps_avg == [0, 25, 50]
+    assert averaged_systems[0].atoms[0].position == pytest.approx(
+        [22.50546, 31.19614, 29.12514]
+    )
+    assert averaged_systems[1].atoms[0].position == pytest.approx(
+        [22.58648, 31.1157, 29.0308]
+    )
+    assert averaged_systems[2].atoms[0].position == pytest.approx(
+        [22.64, 31.0671, 28.9615]
+    )
