@@ -42,8 +42,12 @@ dependencies:
   - pybind11
   - meson-python
   - h5py
+  - scipy
   # Examples
   - gdown
+  - matplotlib
   - pip:
     # works for regular pip packages
     - lammps-logfile
+    # Required for plotting
+    - spirit-extras

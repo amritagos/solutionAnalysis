@@ -1,6 +1,4 @@
 #pragma once
-#include "network_base.hpp"
-#include "undirected_network.hpp"
 #include <cstddef>
 #include <optional>
 #include <vector>
@@ -9,9 +7,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <tuple>
 #include <utility>
 
 // Basics
+#include "bondcorrel.hpp"
 #include "bondfinder.hpp"
 #include "directed_network.hpp"
 #include "network_base.hpp"
@@ -77,6 +77,8 @@ PYBIND11_MODULE(james, m) {
       .def_readwrite("boxLo", &James::Atoms::System::boxLo)
       .def("n_atoms", &James::Atoms::System::n_atoms)
       .def("collect_ids", &James::Atoms::System::collect_ids)
+      .def("collect_positions", &James::Atoms::System::collect_positions)
+      .def("reset_positions", &James::Atoms::System::reset_positions)
       .def("delete",
            static_cast<void (James::Atoms::System::*)(int)>(
                &James::Atoms::System::del),
@@ -140,6 +142,49 @@ PYBIND11_MODULE(james, m) {
   py::enum_<James::Path::WriteIdentifier>(m, "WriteIdentifier")
       .value("AtomID", James::Path::WriteIdentifier::AtomID)
       .value("Index", James::Path::WriteIdentifier::Index);
+  // Binding for the templated time_correlation_function, which is templated on
+  // the network type
+  // For a vector of UndirectedNetwork objects
+  m.def(
+      "time_correlation_function",
+      [](const std::vector<Graph::UndirectedNetwork<double>>
+             &network_time_series,
+         const std::vector<double> &time, int start_t0 = 0, int start_tau = 1,
+         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt,
+         bool continuous_bond = true) {
+        return James::Bond::Correlation::time_correlation_function<
+            Graph::UndirectedNetwork<double>>(network_time_series, time,
+                                              start_t0, start_tau, delta_tau,
+                                              calc_upto_tau, continuous_bond);
+      },
+      pybind11::arg("network_time_series"), pybind11::arg("time"),
+      pybind11::arg("start_t0") = 0, pybind11::arg("start_tau") = 1,
+      pybind11::arg("delta_tau") = 1,
+      pybind11::arg("calc_upto_tau") = std::nullopt,
+      pybind11::arg("continuous_bond") = true,
+      "Time correlation function returning tau values, the normalized "
+      "correlation function values, and the standard error in the "
+      "correlation function values.");
+  // For a vector of DirectedNetwork objects
+  m.def(
+      "time_correlation_function",
+      [](const std::vector<Graph::DirectedNetwork<double>> &network_time_series,
+         const std::vector<double> &time, int start_t0 = 0, int start_tau = 1,
+         int delta_tau = 1, std::optional<int> calc_upto_tau = std::nullopt,
+         bool continuous_bond = true) {
+        return James::Bond::Correlation::time_correlation_function<
+            Graph::DirectedNetwork<double>>(network_time_series, time, start_t0,
+                                            start_tau, delta_tau, calc_upto_tau,
+                                            continuous_bond);
+      },
+      pybind11::arg("network_time_series"), pybind11::arg("time"),
+      pybind11::arg("start_t0") = 0, pybind11::arg("start_tau") = 1,
+      pybind11::arg("delta_tau") = 1,
+      pybind11::arg("calc_upto_tau") = std::nullopt,
+      pybind11::arg("continuous_bond") = true,
+      "Time correlation function returning tau values, the normalized "
+      "correlation function values, and the standard error in the "
+      "correlation function values.");
 }
 
 PYBIND11_MODULE(graphlib, m) {

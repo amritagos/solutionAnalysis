@@ -37,6 +37,7 @@ def test_bond_formation(octahedral_system):
         h_atom_types = [h_type]
         donor_acceptor_cutoff = 3.2
         max_angle_deg = 30  # in degrees
+        # Continuous bonds
         solu.james.add_hbonds(
             network,
             system,

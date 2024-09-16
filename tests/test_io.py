@@ -2,6 +2,7 @@ import pytest
 from pathlib import Path
 import soluanalysis as solu
 from soluanalysis.io import read_lammps_dump, write_lammps_dump
+from soluanalysis.hdf5_io import read_ion_pairs_from_hdf5, save_ion_pairs_to_hdf5
 
 
 @pytest.fixture
@@ -34,6 +35,20 @@ def small_system():
     )  # H2
 
     return system
+
+
+def test_read_slice():
+    """
+    Tests that you can read in a slice of frames from a trajectory file
+    """
+    test_dir = Path(__file__).resolve().parent
+    infilename = test_dir / "../resources/Fe3_water_cluster.lammpstrj"
+    # Read in the trajectory (the last index in the slice is non inclusive)
+    systems, timesteps = solu.io.read_lammps_dump(infilename, "1:3")
+
+    assert len(systems) == 2
+    assert timesteps == [5, 10]
+    assert systems[0].atoms[0].position == [22.4864, 31.2099, 29.1459]
 
 
 def test_write_read_single_dump(small_system):
@@ -121,12 +136,12 @@ def test_hdf5_files(octahedral_system):
     max_depth = 3
     write_identifier = solu.james.WriteIdentifier.AtomID
 
-    solu.io.save_ion_pairs_to_hdf5(
+    save_ion_pairs_to_hdf5(
         file_path, time_series_data, systems[0], max_depth, write_identifier
     )
 
     time_series_read, timesteps_read, system_read, max_depth_read, identifier_read = (
-        solu.io.read_ion_paird_from_hdf5(file_path)
+        read_ion_pairs_from_hdf5(file_path)
     )
 
     assert time_series_read == time_series_data

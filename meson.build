@@ -53,11 +53,20 @@ py.install_sources([
   subdir: 'soluanalysis'
 )
 
-# IO and extras
+# Extras
 py.install_sources([
-    'soluanalysis/io.py',
-    'soluanalysis/ion_pairs.py'
+    'soluanalysis/ion_pairs.py',
+    'soluanalysis/hdf5_io.py',
+    'soluanalysis/misc.py'
   ],
   pure: false,
   subdir: 'soluanalysis'
+)
+
+# Thirdparty ASE and IO 
+py.install_sources([
+    'soluanalysis/thirdparty/ase/io.py',
+  ],
+  pure: false,
+  subdir: 'soluanalysis/'
 )
